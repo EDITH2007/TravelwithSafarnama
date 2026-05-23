@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Sun, Moon, Compass, User } from 'lucide-react'
+import { Menu, X, Sun, Moon, User } from 'lucide-react'
 import { useThemeStore } from '../stores/themeStore'
 
 const navLinks = [
