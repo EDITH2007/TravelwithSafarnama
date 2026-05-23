@@ -9,9 +9,9 @@ const stats = [
 ]
 
 const team = [
-  { name: 'Aryan Mehta', role: 'Founder & CEO', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200' },
-  { name: 'Sneha Gupta', role: 'Head of Content', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200' },
-  { name: 'Vikram Singh', role: 'Lead Developer', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200' },
+  { name: 'Somendra', role: 'Founder & CEO', image: 'public/Anu.png' },
+  { name: 'Emma Watson', role: 'Head of Content', image: 'public/Emma.png' },
+  { name: 'Siddhu Singh', role: 'Lead Developer', image: 'public/Siddhu.png' },
 ]
 
 export default function AboutPage() {

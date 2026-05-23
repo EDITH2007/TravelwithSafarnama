@@ -14,7 +14,7 @@ const testimonials = [
   {
     id: 2,
     name: 'Rahul Verma',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
+    avatar: 'public/Siddhu.png',
     location: 'Mumbai',
     rating: 5,
     text: 'The trip planner feature is a game-changer. I planned my entire Ladakh trip in minutes with perfect itinerary suggestions.',

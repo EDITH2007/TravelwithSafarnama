@@ -252,14 +252,191 @@ export const destinations: Destination[] = [
     isAdventure: false,
     isSpiritual: false,
     isHoneymoon: true,
-  }
+  },
+  {
+    id: '7',
+    slug: 'kerala-backwaters',
+    name: 'Kerala Backwaters',
+    state: 'Kerala',
+    city: 'Alleppey',
+    tagline: 'God\'s Own Country',
+    description: 'A network of tranquil canals, lagoons, and lakes lined with palm trees and houseboats.',
+    overview: 'The Kerala Backwaters are a chain of brackish lagoons and lakes lying parallel to the Arabian Sea coast. Known for its unique ecosystem and houseboat cruises.',
+    images: [
+      'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800',
+      'https://images.unsplash.com/photo-1595658658481-d50d3f27d0c8?w=800',
+      'https://images.unsplash.com/photo-1582510003544-4d00b7e74208?w=800'
+    ],
+    bannerImage: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1600',
+    category: ['beaches', 'honeymoon', 'nature'],
+    bestTimeToVisit: 'November to February',
+    budget: { min: 12000, max: 35000, currency: 'INR' },
+    rating: 4.8,
+    reviewCount: 3421,
+    weather: { current: 28, condition: 'Humid', humidity: 75, windSpeed: 10 },
+    coordinates: { lat: 9.4981, lng: 76.3388 },
+    hotels: [
+      { id: 'h13', name: 'Houseboat Stay', rating: 4.7, price: 8000, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400', amenities: ['Lake View', 'Traditional Food', 'Sun Deck'], distance: 'On the Water' },
+      { id: 'h14', name: 'Kumarakom Resort', rating: 4.9, price: 15000, image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400', amenities: ['Spa', 'Pool', 'Ayurveda'], distance: 'Lake Shore' }
+    ],
+    food: [
+      { id: 'f13', name: 'Kerala Fish Curry', description: 'Coconut-based spicy fish curry', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400', isVegetarian: false, price: 250 },
+      { id: 'f14', name: 'Appam with Stew', description: 'Rice pancakes with vegetable or meat stew', image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400', isVegetarian: true, price: 150 }
+    ],
+    attractions: [
+      { id: 'a13', name: 'Alleppey Beach', description: 'Beautiful beach with a 150-year-old pier', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400', distance: '5 km', type: 'beach' },
+      { id: 'a14', name: 'Vembanad Lake', description: 'Longest lake in India, perfect for houseboat cruises', image: 'https://images.unsplash.com/photo-1595658658481-d50d3f27d0c8?w=400', distance: 'Center', type: 'lake' }
+    ],
+    tips: ['Book houseboats in advance during peak season', 'Try Ayurvedic massage', 'Visit during Onam festival'],
+    reviews: [],
+    isHiddenGem: false,
+    isTrending: true,
+    isAdventure: false,
+    isSpiritual: false,
+    isHoneymoon: true,
+  },
+  {
+    id: '8',
+    slug: 'rishikesh',
+    name: 'Rishikesh',
+    state: 'Uttarakhand',
+    city: 'Rishikesh',
+    tagline: 'Yoga Capital of the World',
+    description: 'Adventure, spirituality, and natural beauty blend perfectly in this holy city on the banks of Ganges.',
+    overview: 'Rishikesh is a city in northern India known as a center for studying yoga and meditation. It sits on the banks of the Ganges River and is surrounded by the Himalayan foothills, offering both spiritual experiences and white-water rafting adventures.',
+    images: [
+      'https://images.unsplash.com/photo-1584196033770-d8445b1740e7?w=800',
+      'https://images.unsplash.com/photo-1549887534-1541e9326643?w=800',
+      'https://images.unsplash.com/photo-1584196033770-d8445b1740e7?w=800'
+    ],
+    bannerImage: 'https://images.unsplash.com/photo-1584196033770-d8445b1740e7?w=1600',
+    category: ['adventure', 'spiritual', 'nature'],
+    bestTimeToVisit: 'September to November, February to April',
+    budget: { min: 8000, max: 25000, currency: 'INR' },
+    rating: 4.7,
+    reviewCount: 2890,
+    weather: { current: 22, condition: 'Pleasant', humidity: 60, windSpeed: 8 },
+    coordinates: { lat: 30.0869, lng: 78.2676 },
+    hotels: [
+      { id: 'h15', name: 'Aloha on the Ganges', rating: 4.8, price: 12000, image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400', amenities: ['River View', 'Yoga Classes', 'Spa'], distance: 'River Bank' },
+      { id: 'h16', name: 'Ganga Kinare', rating: 4.6, price: 8000, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400', amenities: ['Ganga View', 'Rooftop Cafe', 'Ayurveda'], distance: 'Triveni Ghat' }
+    ],
+    food: [
+      { id: 'f15', name: 'Aloo Poori', description: 'Spicy potato curry with fluffy poori bread', image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400', isVegetarian: true, price: 80 },
+      { id: 'f16', name: 'Ganga Kesar Kulfi', description: 'Saffron infused traditional ice cream', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400', isVegetarian: true, price: 100 }
+    ],
+    attractions: [
+      { id: 'a15', name: 'Lakshman Jhula', description: 'Iconic suspension bridge over Ganges with temple views', image: 'https://images.unsplash.com/photo-1549887534-1541e9326643?w=400', distance: '2 km', type: 'landmark' },
+      { id: 'a16', name: 'Triveni Ghat', description: 'Main ghat for evening Ganga Aarti ceremony', image: 'https://images.unsplash.com/photo-1584196033770-d8445b1740e7?w=400', distance: '1 km', type: 'spiritual' },
+      { id: 'a17', name: 'Neelkanth Mahadev Temple', description: 'Ancient Shiva temple in the mountains', image: 'https://images.unsplash.com/photo-1549887534-1541e9326643?w=400', distance: '12 km', type: 'temple' }
+    ],
+    tips: ['Attend evening Ganga Aarti at Triveni Ghat', 'Try white water rafting (Sept-June)', 'Visit Beatles Ashram', 'Take a yoga class'],
+    reviews: [],
+    isHiddenGem: false,
+    isTrending: true,
+    isAdventure: true,
+    isSpiritual: true,
+    isHoneymoon: false
+  },
+  {
+    id: '9',
+    slug: 'udaipur',
+    name: 'Udaipur',
+    state: 'Rajasthan',
+    city: 'Udaipur',
+    tagline: 'City of Lakes',
+    description: 'Romantic palaces, shimmering lakes, and colorful bazaars in the heart of Rajasthan.',
+    overview: 'Udaipur, known as the "City of Lakes," is a beautiful city in Rajasthan surrounded by the Aravalli Hills. Famous for its stunning palaces, serene lakes, and rich cultural heritage, it\'s one of India\'s most romantic destinations.',
+    images: [
+      'https://images.unsplash.com/photo-1558637845-c8b7bd71d95a?w=800',
+      'https://images.unsplash.com/photo-1566684675202-c7c6dd6a6d73?w=800',
+      'https://images.unsplash.com/photo-1568819317551-31051b37d7a6?w=800'
+    ],
+    bannerImage: 'https://images.unsplash.com/photo-1558637845-c8b7bd71d95a?w=1600',
+    category: ['honeymoon', 'heritage', 'romantic'],
+    bestTimeToVisit: 'September to March',
+    budget: { min: 15000, max: 40000, currency: 'INR' },
+    rating: 4.9,
+    reviewCount: 4150,
+    weather: { current: 28, condition: 'Sunny', humidity: 35, windSpeed: 12 },
+    coordinates: { lat: 24.5854, lng: 73.7125 },
+    hotels: [
+      { id: 'h17', name: 'Taj Lake Palace', rating: 4.9, price: 35000, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400', amenities: ['Lake View', 'Private Boat', 'Fine Dining', 'Spa'], distance: 'On Lake Pichola' },
+      { id: 'h18', name: 'The Leela Palace', rating: 4.8, price: 25000, image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400', amenities: ['Palace View', 'Infinity Pool', 'Heritage Walk'], distance: 'City Center' },
+      { id: 'h19', name: 'Jagat Niwas Palace', rating: 4.6, price: 8000, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400', amenities: ['Lake Facing', 'Rooftop Restaurant', 'Heritage Rooms'], distance: 'Pichola Lake' }
+    ],
+    food: [
+      { id: 'f17', name: 'Dal Baati Churma', description: 'Famous Rajasthani dish with lentils, wheat balls, and sweet crushed wheat', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400', isVegetarian: true, price: 300 },
+      { id: 'f18', name: 'Laal Maas', description: 'Spicy red meat curry from Rajasthan', image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400', isVegetarian: false, price: 450 },
+      { id: 'f19', name: 'Gatte ki Sabzi', description: 'Gram flour dumplings in spicy yogurt gravy', image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400', isVegetarian: true, price: 200 }
+    ],
+    attractions: [
+      { id: 'a18', name: 'City Palace', description: 'Largest palace complex in Rajasthan overlooking Lake Pichola', image: 'https://images.unsplash.com/photo-1558637845-c8b7bd71d95a?w=400', distance: 'Center', type: 'palace' },
+      { id: 'a19', name: 'Lake Pichola', description: 'Picturesque man-made lake with stunning sunset views', image: 'https://images.unsplash.com/photo-1566684675202-c7c6dd6a6d73?w=400', distance: 'Center', type: 'lake' },
+      { id: 'a20', name: 'Jag Mandir', description: 'Palace island on Lake Pichola with beautiful gardens', image: 'https://images.unsplash.com/photo-1568819317551-31051b37d7a6?w=400', distance: 'On Lake', type: 'palace' },
+      { id: 'a21', name: 'Sahelion-ki-Bari', description: 'Beautiful gardens with fountains and lotus pools', image: 'https://images.unsplash.com/photo-1558637845-c8b7bd71d95a?w=400', distance: '4 km', type: 'garden' }
+    ],
+    tips: ['Take a sunset boat ride on Lake Pichola', 'Watch Dharohar folk dance show at Bagore-ki-Haveli', 'Shop for miniature paintings in old city', 'Visit Monsoon Palace for panoramic views'],
+    reviews: [],
+    isHiddenGem: false,
+    isTrending: true,
+    isAdventure: false,
+    isSpiritual: false,
+    isHoneymoon: true
+  },
+  {
+    id: '10',
+    slug: 'andaman-nicobar',
+    name: 'Andaman & Nicobar Islands',
+    state: 'Andaman and Nicobar Islands',
+    city: 'Port Blair',
+    tagline: 'Tropical Paradise',
+    description: 'Crystal clear waters, white sandy beaches, and vibrant coral reefs in the Bay of Bengal.',
+    overview: 'The Andaman and Nicobar Islands are a group of pristine islands known for their turquoise waters, white sand beaches, lush rainforests, and incredible marine life. Perfect for beach lovers, scuba divers, and nature enthusiasts.',
+    images: [
+      'https://images.unsplash.com/photo-1582653291997-079a1b04e6d1?w=800',
+      'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=800',
+      'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800'
+    ],
+    bannerImage: 'https://images.unsplash.com/photo-1582653291997-079a1b04e6d1?w=1600',
+    category: ['beaches', 'adventure', 'nature', 'honeymoon'],
+    bestTimeToVisit: 'October to May',
+    budget: { min: 25000, max: 60000, currency: 'INR' },
+    rating: 4.9,
+    reviewCount: 5280,
+    weather: { current: 30, condition: 'Humid', humidity: 80, windSpeed: 15 },
+    coordinates: { lat: 11.7401, lng: 92.6586 },
+    hotels: [
+      { id: 'h20', name: 'Taj Exotica Resort', rating: 4.9, price: 35000, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400', amenities: ['Private Beach', 'Infinity Pool', 'Spa', 'Water Sports'], distance: 'Havelock Island' },
+      { id: 'h21', name: 'Barefoot at Havelock', rating: 4.8, price: 15000, image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400', amenities: ['Eco Resort', 'Beach Front', 'Dive Center'], distance: 'Beach Side' },
+      { id: 'h22', name: 'SeaShell Resort', rating: 4.6, price: 10000, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400', amenities: ['Pool', 'Restaurant', 'Water Activities'], distance: 'Neil Island' }
+    ],
+    food: [
+      { id: 'f20', name: 'Seafood Platter', description: 'Fresh catch including crab, lobster, and fish', image: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=400', isVegetarian: false, price: 800 },
+      { id: 'f21', name: 'Coconut Prawn Curry', description: 'Andaman style prawn curry with coconut milk', image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400', isVegetarian: false, price: 450 },
+      { id: 'f22', name: 'Tropical Fruit Salad', description: 'Fresh local fruits including mango, pineapple, and papaya', image: 'https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400', isVegetarian: true, price: 200 }
+    ],
+    attractions: [
+      { id: 'a22', name: 'Radhanagar Beach', description: 'Asia\'s best beach with pristine white sand and turquoise waters', image: 'https://images.unsplash.com/photo-1582653291997-079a1b04e6d1?w=400', distance: 'Havelock Island', type: 'beach' },
+      { id: 'a23', name: 'Elephant Beach', description: 'Famous for snorkeling and coral reefs', image: 'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=400', distance: 'Havelock Island', type: 'beach' },
+      { id: 'a24', name: 'Cellular Jail', description: 'Historic colonial prison with light and sound show', image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=400', distance: 'Port Blair', type: 'historical' },
+      { id: 'a25', name: 'North Bay Island', description: 'Famous for coral reefs and underwater activities', image: 'https://images.unsplash.com/photo-1582653291997-079a1b04e6d1?w=400', distance: '15 min boat', type: 'island' }
+    ],
+    tips: ['Book ferry tickets in advance', 'Carry reef-safe sunscreen', 'Take a scuba diving course', 'Visit Ross Island for ruins', 'Try snorkeling at Elephant Beach'],
+    reviews: [],
+    isHiddenGem: false,
+    isTrending: true,
+    isAdventure: true,
+    isSpiritual: false,
+    isHoneymoon: true
+  },
 ]
 
-export const getDestinationBySlug = (slug: string) => 
+export const getDestinationBySlug = (slug: string) =>
   destinations.find(d => d.slug === slug)
 
-export const getTrendingDestinations = () => 
+export const getTrendingDestinations = () =>
   destinations.filter(d => d.isTrending)
 
-export const getHiddenGems = () => 
+export const getHiddenGems = () =>
   destinations.filter(d => d.isHiddenGem)
