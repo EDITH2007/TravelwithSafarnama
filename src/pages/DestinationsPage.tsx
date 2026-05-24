@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, Grid, List } from 'lucide-react'
 import { destinations } from '../data/destinations'
@@ -7,12 +8,22 @@ import DestinationCard from '../components/DestinationCard'
 export default function DestinationsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [searchParams] = useSearchParams()
+  const categoryQuery = searchParams.get('category') || ''
 
-  const filteredDestinations = destinations.filter((dest) =>
-    dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dest.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    dest.category.some((cat) => cat.toLowerCase().includes(searchQuery.toLowerCase()))
-  )
+  const filteredDestinations = destinations.filter((dest) => {
+    const matchesCategory = categoryQuery
+      ? dest.category.some((cat) => cat.toLowerCase().includes(categoryQuery.toLowerCase()))
+      : true
+
+    const matchesSearch = searchQuery
+      ? dest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dest.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dest.category.some((cat) => cat.toLowerCase().includes(searchQuery.toLowerCase()))
+      : true
+
+    return matchesCategory && matchesSearch
+  })
 
   return (
     <main className="pt-20 min-h-screen bg-gray-50 dark:bg-gray-950">

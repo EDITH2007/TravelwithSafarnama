@@ -3,7 +3,10 @@ import { destinations } from '../data/destinations'
 import DestinationCard from './DestinationCard'
 
 export default function FeaturedDestinations() {
-  const featured = destinations.slice(0, 6)
+  const rameshwaram = destinations.find((destination) => destination.slug === 'rameshwaram')
+  const featured = destinations.slice(0, 6).map((destination) =>
+    destination.slug === 'hampi' && rameshwaram ? rameshwaram : destination
+  )
 
   return (
     <section className="py-20 section-padding bg-gray-50 dark:bg-gray-950">

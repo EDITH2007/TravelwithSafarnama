@@ -5,7 +5,7 @@ import { getHiddenGems } from '../data/destinations'
 import DestinationCard from './DestinationCard'
 
 export default function HiddenGemsSection() {
-  const hiddenGems = getHiddenGems()
+  const hiddenGems = getHiddenGems().slice(0, 6)
 
   return (
     <section className="py-20 section-padding bg-gradient-to-b from-gray-50 to-white 
