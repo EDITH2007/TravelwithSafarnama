@@ -2743,11 +2743,11 @@ export const destinations: Destination[] = [
     description: 'A legendary high-altitude road journey that takes travelers through dramatic mountain passes, frozen rivers, and remote valleys.',
     overview: 'The Manali-Leh Highway is one of India’s most iconic road trips, crossing Rohtang Pass, Baralacha La, and Tanglang La on the way to Leh. Riders and drivers alike enjoy rugged landscapes, adventure stops, and unforgettable mountain views.',
     images: [
-      'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800',
+      'https://travelmelodies.com/wp-content/uploads/2017/08/leh-manali-highway.jpg',
       'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
       'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1600',
+    bannerImage: 'https://travelmelodies.com/wp-content/uploads/2017/08/leh-manali-highway.jpg',
     category: ['road trips', 'mountains', 'adventure'],
     bestTimeToVisit: 'June to September',
     budget: { min: 18000, max: 42000, currency: 'INR' },
@@ -2785,11 +2785,11 @@ export const destinations: Destination[] = [
     description: 'A rugged road trip through remote valleys, ancient monasteries, and stark alpine landscapes in the rain-shadow of the Himalayas.',
     overview: 'The Spiti Valley Circuit connects Kaza, Tabo, Dhankar, and Kibber with narrow roads and dramatic vistas. This journey is perfect for travelers seeking a pure road trip experience with cultural stops and wild scenery.',
     images: [
-      'https://images.unsplash.com/photo-1526481280692-3bfa7568e15c?w=800',
+      'https://offbeatwanderers.com/storage/2024/04/Spiti-Valley-Circuit-Tour.jpg',
       'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
       'https://images.unsplash.com/photo-1547586696-9cbe10e1bc28?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1526481280692-3bfa7568e15c?w=1600',
+    bannerImage: 'https://offbeatwanderers.com/storage/2024/04/Spiti-Valley-Circuit-Tour.jpg',
     category: ['road trips', 'mountains', 'hidden-gem'],
     bestTimeToVisit: 'June to September',
     budget: { min: 16000, max: 38000, currency: 'INR' },
@@ -2827,11 +2827,11 @@ export const destinations: Destination[] = [
     description: 'A dramatic road journey from Srinagar to Sonmarg, crossing the famous Zoji La Pass with panoramic valley views.',
     overview: 'This scenic highway takes you through lush Kashmiri meadows, along the Sindh River, and over the snow-laced Zoji La Pass. It is a thrilling road trip for both bikers and drivers alike.',
     images: [
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800',
+      'https://chalbanjare.com/crmnew/img_master/package/sonamarg3_17667468084.webp',
       'https://images.unsplash.com/photo-1494526585095-c41746248156?w=800',
       'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1494526585095-c41746248156?w=1600',
+    bannerImage: 'https://chalbanjare.com/crmnew/img_master/package/sonamarg3_17667468084.webp',
     category: ['road trips', 'mountains', 'adventure'],
     bestTimeToVisit: 'May to September',
     budget: { min: 14000, max: 33000, currency: 'INR' },
@@ -2869,11 +2869,11 @@ export const destinations: Destination[] = [
     description: 'A scenic coastal ride from the bustling streets of Mumbai to the sun-kissed beaches of Goa along the Konkan coast.',
     overview: 'This coastal route hugs the Arabian Sea with frequent sea views, quaint fishing villages, and beachside stops. Ideal for riders who enjoy coastal air, seaside food, and relaxed pit-stops.',
     images: [
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_goa_main_tv_destination_img_1_l_759_1138.jpg',
       'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
       'https://images.unsplash.com/photo-1493558103817-58b2924bce98?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_goa_main_tv_destination_img_1_l_759_1138.jpg',
     category: ['road trips', 'beaches', 'nature'],
     bestTimeToVisit: 'October to March',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -2909,10 +2909,10 @@ export const destinations: Destination[] = [
     description: 'A lush ride through coffee estates, misty forests, and curvy roads — perfect for riders who love greenery and winding routes.',
     overview: 'The Coorg to Wayanad route threads through coffee plantations, panoramic viewpoints, and rain-soaked forests. Expect curvy roads, aromatic coffee stops, and frequent rain clouds in the monsoon.',
     images: [
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800',
+      'https://www.keralaholidays.com/uploads/tourpackages-gallery/thumb/Wayanad-Tour_(1).jpg',
       'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600',
+    bannerImage: 'https://www.keralaholidays.com/uploads/tourpackages-gallery/thumb/Wayanad-Tour_(1).jpg',
     category: ['road trips', 'nature', 'hills'],
     bestTimeToVisit: 'September to February',
     budget: { min: 6000, max: 18000, currency: 'INR' },
@@ -2947,10 +2947,10 @@ export const destinations: Destination[] = [
     description: 'Drive through states where clouds drift along the road, waterfalls cascade beside the highway, and fresh mountain air fills your lungs.',
     overview: 'Meghalaya offers dramatic monsoon scenes with clouds floating across highland roads, plentiful waterfalls, and clean, well-kept routes that make for an unforgettable road trip experience.',
     images: [
-      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
+      'https://hblimg.mmtcdn.com/content/hubble/img/states_img/mmt/activities/m_meghalaya_landscape_2_l_619_928.jpg',
       'https://images.unsplash.com/photo-1526481280692-3bfa7568e15c?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1526481280692-3bfa7568e15c?w=1600',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/states_img/mmt/activities/m_meghalaya_landscape_2_l_619_928.jpg',
     category: ['road trips', 'nature', 'waterfalls'],
     bestTimeToVisit: 'October to May',
     budget: { min: 8000, max: 22000, currency: 'INR' },
@@ -2987,10 +2987,10 @@ export const destinations: Destination[] = [
     description: 'An open-highway desert drive with vast dunes, golden sunsets, and historic forts punctuating the route.',
     overview: 'The Jaisalmer desert route gives vintage travel vibes: long straight roads, soft dunes, and fort towns where time slows down — perfect for sunset chases and highway cruising.',
     images: [
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800',
+      'https://pbs.twimg.com/media/FC95GetXsAQv_PH.jpg',
       'https://images.unsplash.com/photo-1494526585095-c41746248156?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600',
+    bannerImage: 'https://pbs.twimg.com/media/FC95GetXsAQv_PH.jpg',
     category: ['road trips', 'desert', 'heritage'],
     bestTimeToVisit: 'October to March',
     budget: { min: 7000, max: 20000, currency: 'INR' },
@@ -3027,10 +3027,10 @@ export const destinations: Destination[] = [
     description: 'A spiritual and scenic drive following the Ganga, with mountain temples, riverside roads, and Devbhoomi (land of the gods) ambience.',
     overview: 'This route from Rishikesh to Badrinath offers a blend of river-side riding, high Himalayan passes, and pilgrimage stops — ideal for riders seeking spiritual peace and mountain temples.',
     images: [
-      'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800',
+      'https://travelvaidya.com/blog/wp-content/uploads/2025/07/ChatGPT-Image-Jul-8-2025-05_08_04-PM.png',
       'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1600',
+    bannerImage: 'https://travelvaidya.com/blog/wp-content/uploads/2025/07/ChatGPT-Image-Jul-8-2025-05_08_04-PM.png',
     category: ['road trips', 'spiritual', 'mountains'],
     bestTimeToVisit: 'May to October',
     budget: { min: 9000, max: 26000, currency: 'INR' },
