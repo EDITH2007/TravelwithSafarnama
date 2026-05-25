@@ -305,11 +305,11 @@ export const destinations: Destination[] = [
     description: 'Adventure, spirituality, and natural beauty blend perfectly in this holy city on the banks of Ganges.',
     overview: 'Rishikesh is a city in northern India known as a center for studying yoga and meditation. It sits on the banks of the Ganges River and is surrounded by the Himalayan foothills, offering both spiritual experiences and white-water rafting adventures.',
     images: [
-      'https://images.unsplash.com/photo-1584196033770-d8445b1740e7?w=800',
+      'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_Rishikesh_tv_destination_img_3_l_772_1158.jpg',
       'https://images.unsplash.com/photo-1549887534-1541e9326643?w=800',
       'https://images.unsplash.com/photo-1584196033770-d8445b1740e7?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1584196033770-d8445b1740e7?w=1600',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_Rishikesh_tv_destination_img_3_l_772_1158.jpg',
     category: ['adventure', 'spiritual', 'nature'],
     bestTimeToVisit: 'September to November, February to April',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -348,11 +348,11 @@ export const destinations: Destination[] = [
     description: 'Romantic palaces, shimmering lakes, and colorful bazaars in the heart of Rajasthan.',
     overview: 'Udaipur, known as the "City of Lakes," is a beautiful city in Rajasthan surrounded by the Aravalli Hills. Famous for its stunning palaces, serene lakes, and rich cultural heritage, it\'s one of India\'s most romantic destinations.',
     images: [
-      'https://images.unsplash.com/photo-1558637845-c8b7bd71d95a?w=800',
+      'https://r2imghtlak.mmtcdn.com/r2-mmt-htl-image/htl-imgs/202505092116398099-f8e51e14-f4fb-426f-8b55-050459edce90.jpg',
       'https://images.unsplash.com/photo-1566684675202-c7c6dd6a6d73?w=800',
       'https://images.unsplash.com/photo-1568819317551-31051b37d7a6?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1558637845-c8b7bd71d95a?w=1600',
+    bannerImage: 'https://r2imghtlak.mmtcdn.com/r2-mmt-htl-image/htl-imgs/202505092116398099-f8e51e14-f4fb-426f-8b55-050459edce90.jpg',
     category: ['honeymoon', 'heritage', 'romantic'],
     bestTimeToVisit: 'September to March',
     budget: { min: 15000, max: 40000, currency: 'INR' },
@@ -394,11 +394,11 @@ export const destinations: Destination[] = [
     description: 'Crystal clear waters, white sandy beaches, and vibrant coral reefs in the Bay of Bengal.',
     overview: 'The Andaman and Nicobar Islands are a group of pristine islands known for their turquoise waters, white sand beaches, lush rainforests, and incredible marine life. Perfect for beach lovers, scuba divers, and nature enthusiasts.',
     images: [
-      'https://images.unsplash.com/photo-1582653291997-079a1b04e6d1?w=800',
+      'https://hblimg.mmtcdn.com/content/hubble/img/havelock/mmt/destination/m_destination_havelock_landscape_l_400_640.jpg',
       'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=800',
       'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=800'
     ],
-    bannerImage: 'https://images.unsplash.com/photo-1582653291997-079a1b04e6d1?w=1600',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/havelock/mmt/destination/m_destination_havelock_landscape_l_400_640.jpg',
     category: ['beaches', 'adventure', 'nature', 'honeymoon'],
     bestTimeToVisit: 'October to May',
     budget: { min: 25000, max: 60000, currency: 'INR' },
@@ -440,11 +440,11 @@ export const destinations: Destination[] = [
     description: 'Former summer capital of British India, known for its colonial architecture and scenic beauty.',
     overview: 'Shimla, the capital of Himachal Pradesh, is famous for its Mall Road, Ridge, and colonial-era buildings. Surrounded by pine and deodar forests, it offers beautiful views of the Himalayas.',
     images: [
-      '/images/shimla/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Shimla_main_tv_destination_img_1_l_596_907.jpg',
       '/images/shimla/image2.jpg',
       '/images/shimla/image3.jpg'
     ],
-    bannerImage: '/images/shimla/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Shimla_main_tv_destination_img_1_l_596_907.jpg',
     category: ['mountains', 'heritage'],
     bestTimeToVisit: 'March to June, December to January',
     budget: { min: 12000, max: 35000, currency: 'INR' },
@@ -482,11 +482,11 @@ export const destinations: Destination[] = [
     description: 'Home to the Dalai Lama, offering Tibetan culture, monasteries, and stunning mountain views.',
     overview: 'Dharamshala, particularly Upper Dharamshala (McLeod Ganj), is the residence of the 14th Dalai Lama. It is a center of Tibetan Buddhism with beautiful monasteries, trekking trails, and waterfalls.',
     images: [
-      '/images/dharamshala/image1.jpg',
+      'https://www.swantour.com/blogs/wp-content/uploads/2020/01/Dharamsala-Cricket-Stadium.jpg',
       '/images/dharamshala/image2.jpg',
       '/images/dharamshala/image3.jpg'
     ],
-    bannerImage: '/images/dharamshala/banner.jpg',
+    bannerImage: 'https://www.swantour.com/blogs/wp-content/uploads/2020/01/Dharamsala-Cricket-Stadium.jpg',
     category: ['mountains', 'spiritual'],
     bestTimeToVisit: 'March to June, September to November',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -608,11 +608,11 @@ export const destinations: Destination[] = [
     description: 'A charming hill station with colonial charm, scenic views, and pleasant weather year-round.',
     overview: 'Mussoorie is a beautiful hill station in Uttarakhand, known for its stunning views of the Doon Valley and Himalayas. Popular for its Mall Road, Gun Hill, and Kempty Falls.',
     images: [
-      '/images/mussoorie/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Mussorrie_main_tv_destination_img_1_l_639_958.jpg',
       '/images/mussoorie/image2.jpg',
       '/images/mussoorie/image3.jpg'
     ],
-    bannerImage: '/images/mussoorie/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Mussorrie_main_tv_destination_img_1_l_639_958.jpg',
     category: ['mountains', 'honeymoon'],
     bestTimeToVisit: 'April to June, September to November',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -650,11 +650,11 @@ export const destinations: Destination[] = [
     description: 'A beautiful lake district surrounded by seven hills, known for its serene Naini Lake.',
     overview: 'Nainital is a charming hill station in Uttarakhand, built around the emerald-shaped Naini Lake. Surrounded by seven hills, it offers boating, scenic views, and colonial-era architecture.',
     images: [
-      '/images/nainital/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_Nainital_tv_destination_img_2_l_655_981.jpg',
       '/images/nainital/image2.jpg',
       '/images/nainital/image3.jpg'
     ],
-    bannerImage: '/images/nainital/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_Nainital_tv_destination_img_2_l_655_981.jpg',
     category: ['lakes', 'mountains'],
     bestTimeToVisit: 'March to June, September to November',
     budget: { min: 10000, max: 28000, currency: 'INR' },
@@ -692,11 +692,11 @@ export const destinations: Destination[] = [
     description: 'A pristine hill station famous for ski slopes, panoramic Himalayan views, and cable car rides.',
     overview: 'Auli is a popular ski destination in Uttarakhand, offering stunning views of Nanda Devi, Mana Parvat, and Kamet peaks. Known for its longest cable car, artificial lake, and winter sports.',
     images: [
-      '/images/auli/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/aulidestimage/mmt/activities/m_Auli_MarNew_2_l_800_1200.png',
       '/images/auli/image2.jpg',
       '/images/auli/image3.jpg'
     ],
-    bannerImage: '/images/auli/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/aulidestimage/mmt/activities/m_Auli_MarNew_2_l_800_1200.png',
     category: ['skiing', 'adventure'],
     bestTimeToVisit: 'December to February (skiing), May to June (summer)',
     budget: { min: 15000, max: 40000, currency: 'INR' },
@@ -818,11 +818,11 @@ export const destinations: Destination[] = [
     description: 'A golden-hued city rising from the Thar Desert, famous for its sandstone fort and camel safaris.',
     overview: 'Jaisalmer is a stunning city in the heart of the Thar Desert, known for its yellow sandstone architecture that glows golden at sunset. Famous for the living fort, havelis, and desert camping experiences.',
     images: [
-      '/images/jaisalmer/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_jaisalmer_main_tv_destination_img_1_l_869_1294.jpg',
       '/images/jaisalmer/image2.jpg',
       '/images/jaisalmer/image3.jpg'
     ],
-    bannerImage: '/images/jaisalmer/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_jaisalmer_main_tv_destination_img_1_l_869_1294.jpg',
     category: ['desert', 'heritage'],
     bestTimeToVisit: 'October to March',
     budget: { min: 12000, max: 35000, currency: 'INR' },
@@ -864,11 +864,11 @@ export const destinations: Destination[] = [
     description: 'A beautiful blue-hued city dominated by the mighty Mehrangarh Fort.',
     overview: 'Jodhpur, the second-largest city in Rajasthan, is known as the Blue City for its blue-painted houses around Mehrangarh Fort. Famous for its imposing fort, delicious street food, and vibrant markets.',
     images: [
-      '/images/jodhpur/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_jodhpur_main_tv_destination_img_1_l_815_1448.jpg',
       '/images/jodhpur/image2.jpg',
       '/images/jodhpur/image3.jpg'
     ],
-    bannerImage: '/images/jodhpur/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_jodhpur_main_tv_destination_img_1_l_815_1448.jpg',
     category: ['heritage', 'culture'],
     bestTimeToVisit: 'October to March',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -910,11 +910,11 @@ export const destinations: Destination[] = [
     description: 'A holy city famous for the Brahma Temple, sacred lake, and vibrant camel fair.',
     overview: 'Pushkar is an ancient city in Rajasthan, known for its sacred Pushkar Lake, the only Brahma Temple in the world, and the annual Pushkar Camel Fair. It\'s a major pilgrimage site with a bohemian atmosphere.',
     images: [
-      '/images/pushkar/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/ajmer/mmt/activities/m_activities_ajmer_pushkar_lake_l_441_662.jpg',
       '/images/pushkar/image2.jpg',
       '/images/pushkar/image3.jpg'
     ],
-    bannerImage: '/images/pushkar/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/ajmer/mmt/activities/m_activities_ajmer_pushkar_lake_l_441_662.jpg',
     category: ['spiritual', 'culture'],
     bestTimeToVisit: 'October to March',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -956,11 +956,11 @@ export const destinations: Destination[] = [
     description: 'A desert city famous for its sandstone palaces, camel breeding farm, and delicious snacks.',
     overview: 'Bikaner is a vibrant desert city in Rajasthan, known for its well-preserved Junagarh Fort, stunning havelis, and the National Research Centre on Camels. Famous for its spicy cuisine and sweet snacks.',
     images: [
-      '/images/bikaner/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Bikaner_tv_destination_img_1_l_562_1000.jpg',
       '/images/bikaner/image2.jpg',
       '/images/bikaner/image3.jpg'
     ],
-    bannerImage: '/images/bikaner/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Bikaner_tv_destination_img_1_l_562_1000.jpg',
     category: ['heritage', 'hidden-gem', 'desert'],
     bestTimeToVisit: 'October to March',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -1002,11 +1002,11 @@ export const destinations: Destination[] = [
     description: 'The only hill station in Rajasthan, offering cool climate, lakes, and ancient temples.',
     overview: 'Mount Abu is the only hill station in Rajasthan, situated in the Aravalli Range. Known for its pleasant climate, beautiful Nakki Lake, and the stunning Dilwara Jain Temples, it\'s a perfect getaway for couples and families.',
     images: [
-      '/images/mount-abu/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_Mount_Abu_tv_destination_img_1_l_709_1065.jpg',
       '/images/mount-abu/image2.jpg',
       '/images/mount-abu/image3.jpg'
     ],
-    bannerImage: '/images/mount-abu/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_Mount_Abu_tv_destination_img_1_l_709_1065.jpg',
     category: ['hills', 'honeymoon'],
     bestTimeToVisit: 'March to June, September to November',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -1048,11 +1048,11 @@ export const destinations: Destination[] = [
     description: 'A small town famous for its beautifully painted havelis and frescoed walls.',
     overview: 'Mandawa is a small town in the Shekhawati region, known as the "Open Art Gallery" of Rajasthan. Famous for its exquisitely painted havelis with stunning frescoes depicting mythological and everyday scenes.',
     images: [
-      '/images/mandawa/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/imgs_coll_dest/mmt/activities/m_mandawa_dest_img_l_533_938.jpg',
       '/images/mandawa/image2.jpg',
       '/images/mandawa/image3.jpg'
     ],
-    bannerImage: '/images/mandawa/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/imgs_coll_dest/mmt/activities/m_mandawa_dest_img_l_533_938.jpg',
     category: ['heritage', 'hidden-gem', 'culture'],
     bestTimeToVisit: 'October to March',
     budget: { min: 7000, max: 20000, currency: 'INR' },
@@ -1094,11 +1094,11 @@ export const destinations: Destination[] = [
     description: 'Witness the eternal symbol of love - the magnificent Taj Mahal, along with other Mughal architectural wonders.',
     overview: 'Agra is famous for the Taj Mahal, one of the Seven Wonders of the World. This city on the Yamuna River is rich in Mughal architecture, including the Agra Fort and Fatehpur Sikri, making it a UNESCO World Heritage hub.',
     images: [
-      '/images/agra/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/agra/mmt/activities/t_ufs/m_activities-agra-taj-mahal_l_400_640.jpg',
       '/images/agra/image2.jpg',
       '/images/agra/image3.jpg'
     ],
-    bannerImage: '/images/agra/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/agra/mmt/activities/t_ufs/m_activities-agra-taj-mahal_l_400_640.jpg',
     category: ['heritage', 'honeymoon'],
     bestTimeToVisit: 'October to March',
     budget: { min: 10000, max: 35000, currency: 'INR' },
@@ -1141,11 +1141,11 @@ export const destinations: Destination[] = [
     description: 'Famous for UNESCO World Heritage temples with intricate erotic sculptures and stunning architecture.',
     overview: 'Khajuraho is known for its magnificent group of Hindu and Jain temples, famous for their erotic sculptures and exquisite architectural detail. Built by the Chandela dynasty between 950-1050 AD, these temples are a UNESCO World Heritage Site.',
     images: [
-      '/images/khajuraho/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Khajuraho_tv_destination_img_1_l_667_1000.jpg',
       '/images/khajuraho/image2.jpg',
       '/images/khajuraho/image3.jpg'
     ],
-    bannerImage: '/images/khajuraho/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Khajuraho_tv_destination_img_1_l_667_1000.jpg',
     category: ['heritage', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -1188,11 +1188,11 @@ export const destinations: Destination[] = [
     description: 'A medieval city frozen in time, with stunning palaces, temples, and cenotaphs on Betwa River.',
     overview: 'Orchha is a beautiful town on the Betwa River, known for its well-preserved palaces, temples, and cenotaphs (chhatris) that showcase Bundela architecture. Founded in 1501, it feels like a city frozen in medieval times.',
     images: [
-      '/images/orchha/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/orchha/mmt/activities/m_activities_orchha_wildlife_sanctuary_orchha_l_425_640.jpg',
       '/images/orchha/image2.jpg',
       '/images/orchha/image3.jpg'
     ],
-    bannerImage: '/images/orchha/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/orchha/mmt/activities/m_activities_orchha_wildlife_sanctuary_orchha_l_425_640.jpg',
     category: ['heritage', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 7000, max: 20000, currency: 'INR' },
@@ -1235,11 +1235,11 @@ export const destinations: Destination[] = [
     description: 'The only hill station in Madhya Pradesh, with stunning waterfalls, caves, and lush forests.',
     overview: 'Pachmarhi is the only hill station in Madhya Pradesh, nestled in the Satpura Range. Known for its stunning waterfalls, ancient caves, breathtaking viewpoints, and rich biodiversity, it\'s a perfect nature getaway.',
     images: [
-      '/images/pachmarhi/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Pachmarhi_tv_destination_img_1_l_667_1000.jpg',
       '/images/pachmarhi/image2.jpg',
       '/images/pachmarhi/image3.jpg'
     ],
-    bannerImage: '/images/pachmarhi/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Pachmarhi_tv_destination_img_1_l_667_1000.jpg',
     category: ['hills', 'hidden-gem'],
     bestTimeToVisit: 'October to June',
     budget: { min: 8000, max: 22000, currency: 'INR' },
@@ -1282,11 +1282,11 @@ export const destinations: Destination[] = [
     description: 'Famous for towering marble cliffs along Narmada River, creating spectacular scenery.',
     overview: 'Bhedaghat is famous for the Marble Rocks - towering white marble cliffs rising on both sides of the Narmada River. A boat ride through the gorge, especially on a moonlit night, is a magical experience. Also home to the spectacular Dhuandhar Falls.',
     images: [
-      '/images/bhedaghat/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/Jabalpur/mmt/activities/m_activities_jabalpur_bhedaghat_l_385_513.jpg',
       '/images/bhedaghat/image2.jpg',
       '/images/bhedaghat/image3.jpg'
     ],
-    bannerImage: '/images/bhedaghat/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/Jabalpur/mmt/activities/m_activities_jabalpur_bhedaghat_l_385_513.jpg',
     category: ['waterfalls', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 6000, max: 18000, currency: 'INR' },
@@ -1329,11 +1329,11 @@ export const destinations: Destination[] = [
     description: 'UNESCO World Heritage site famous for ancient Buddhist stupas, pillars, and monasteries.',
     overview: 'Sanchi is famous for its Great Stupa, one of the oldest stone structures in India, commissioned by Emperor Ashoka in the 3rd century BCE. This UNESCO World Heritage site is the best-preserved Buddhist complex in India.',
     images: [
-      '/images/sanchi/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/bhopal/mmt/activities/m_Sanchi-1_l_274_433.jpg',
       '/images/sanchi/image2.jpg',
       '/images/sanchi/image3.jpg'
     ],
-    bannerImage: '/images/sanchi/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/bhopal/mmt/activities/m_Sanchi-1_l_274_433.jpg',
     category: ['heritage', 'spiritual'],
     bestTimeToVisit: 'October to March',
     budget: { min: 6000, max: 18000, currency: 'INR' },
@@ -1376,11 +1376,11 @@ export const destinations: Destination[] = [
     description: 'A beautiful island with Portuguese-era architecture, pristine beaches, and relaxed vibes.',
     overview: 'Diu is a charming island off the coast of Gujarat, known for its unique blend of Portuguese and Indian culture. With its stunning beaches, historic forts, churches, and laid-back atmosphere, it\'s a perfect hidden gem for beach lovers.',
     images: [
-      '/images/diu/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/diu/mmt/activities/m_activities_diu_diu_fort_l_486_729.jpg?im=Resize=(412,347.56)',
       '/images/diu/image2.jpg',
       '/images/diu/image3.jpg'
     ],
-    bannerImage: '/images/diu/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/diu/mmt/activities/m_activities_diu_diu_fort_l_486_729.jpg?im=Resize=(412,347.56)',
     category: ['beaches', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -1425,11 +1425,11 @@ export const destinations: Destination[] = [
     description: 'A coastal gem with Portuguese architecture, serene beaches, and peaceful atmosphere.',
     overview: 'Daman is a small coastal town with a rich Portuguese colonial history. Divided by the Daman Ganga River into Nani-Daman (Little Daman) and Moti-Daman (Big Daman), it offers beautiful churches, forts, and peaceful beaches.',
     images: [
-      '/images/daman/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Daman_tv_destination_img_2_l_1044_1567.jpg',
       '/images/daman/image2.jpg',
       '/images/daman/image3.jpg'
     ],
-    bannerImage: '/images/daman/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Daman_tv_destination_img_2_l_1044_1567.jpg',
     category: ['beaches', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 7000, max: 22000, currency: 'INR' },
@@ -1473,11 +1473,11 @@ export const destinations: Destination[] = [
     description: 'A vast expanse of white salt desert that transforms into a magical landscape under full moon.',
     overview: 'The Rann of Kutch is a seasonal salt marsh in the Thar Desert, famous for the Rann Utsav festival. This white desert stretches for thousands of square kilometers and becomes a spectacular sight during the full moon, reflecting moonlight like a mirror.',
     images: [
-      '/images/kutch/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/kutch/mmt/destination/m_Kutch_activity_adventure_l_468_661.jpg',
       '/images/kutch/image2.jpg',
       '/images/kutch/image3.jpg'
     ],
-    bannerImage: '/images/kutch/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/kutch/mmt/destination/m_Kutch_activity_adventure_l_468_661.jpg',
     category: ['desert', 'culture'],
     bestTimeToVisit: 'October to February (during Rann Utsav)',
     budget: { min: 12000, max: 40000, currency: 'INR' },
@@ -1522,11 +1522,11 @@ export const destinations: Destination[] = [
     description: 'The only place in the world to see Asiatic lions in their natural habitat.',
     overview: 'Gir National Park is the only home of the majestic Asiatic lions in the wild. This protected forest area also hosts leopards, deer, crocodiles, and numerous bird species. Jeep safaris offer a chance to spot lions in their natural environment.',
     images: [
-      '/images/gir/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/sasan_gir/mmt/activities/m_Gir%20National%20Park-1_l_350_525.jpg?im=Resize=(412,347.56)',
       '/images/gir/image2.jpg',
       '/images/gir/image3.jpg'
     ],
-    bannerImage: '/images/gir/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/sasan_gir/mmt/activities/m_Gir%20National%20Park-1_l_350_525.jpg?im=Resize=(412,347.56)',
     category: ['wildlife', 'hidden-gem'],
     bestTimeToVisit: 'December to April',
     budget: { min: 10000, max: 35000, currency: 'INR' },
@@ -1570,11 +1570,11 @@ export const destinations: Destination[] = [
     description: 'The only hill station in Gujarat, nestled in the Sahyadri hills with scenic lakes and viewpoints.',
     overview: 'Saputara is Gujarat\'s only hill station, located in the Dang district at the edge of the Western Ghats. It offers pleasant climate, beautiful lake, tribal culture, and stunning viewpoints. The name means "Abode of Serpents" in Sanskrit.',
     images: [
-      '/images/saputara/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Saputara_tv_destination_img_1_l_667_1000.jpg',
       '/images/saputara/image2.jpg',
       '/images/saputara/image3.jpg'
     ],
-    bannerImage: '/images/saputara/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Saputara_tv_destination_img_1_l_667_1000.jpg',
     category: ['hills', 'hidden-gem'],
     bestTimeToVisit: 'October to June',
     budget: { min: 8000, max: 22000, currency: 'INR' },
@@ -1619,11 +1619,11 @@ export const destinations: Destination[] = [
     description: 'A breathtaking hill station known for endless tea plantations, misty mountains, and lush greenery.',
     overview: 'Munnar is a beautiful hill station in the Western Ghats, famous for its sprawling tea estates, rolling hills, and pristine valleys. It\'s one of South India\'s most popular honeymoon destinations.',
     images: [
-      '/images/munnar/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Munnar_main_tv_destination_img_1_l_630_946.jpg',
       '/images/munnar/image2.jpg',
       '/images/munnar/image3.jpg'
     ],
-    bannerImage: '/images/munnar/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Munnar_main_tv_destination_img_1_l_630_946.jpg',
     category: ['tea gardens', 'honeymoon'],
     bestTimeToVisit: 'September to May',
     budget: { min: 10000, max: 35000, currency: 'INR' },
@@ -1666,11 +1666,11 @@ export const destinations: Destination[] = [
     description: 'Famous for serene backwaters, houseboat cruises, and palm-fringed canals.',
     overview: 'Alleppey (Alappuzha) is renowned for its picturesque backwaters, houseboat stays, and lush green landscapes. A houseboat cruise through the canals offers a unique experience of Kerala village life.',
     images: [
-      '/images/alleppey/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Alleppey_main_tv_destination_img_1_l_708_1102.jpg',
       '/images/alleppey/image2.jpg',
       '/images/alleppey/image3.jpg'
     ],
-    bannerImage: '/images/alleppey/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Alleppey_main_tv_destination_img_1_l_708_1102.jpg',
     category: ['backwaters', 'hidden-gem'],
     bestTimeToVisit: 'October to February',
     budget: { min: 12000, max: 40000, currency: 'INR' },
@@ -1713,11 +1713,11 @@ export const destinations: Destination[] = [
     description: 'A pristine hill district with lush forests, wildlife, waterfalls, and ancient caves.',
     overview: 'Wayanad is a beautiful hill district in Kerala known for its dense forests, wildlife sanctuaries, spice plantations, and prehistoric caves. It offers a perfect escape into nature with trekking opportunities.',
     images: [
-      '/images/wayanad/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_wayanad_tv_destination_img_1_l_572_854.jpg',
       '/images/wayanad/image2.jpg',
       '/images/wayanad/image3.jpg'
     ],
-    bannerImage: '/images/wayanad/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_wayanad_tv_destination_img_1_l_572_854.jpg',
     category: ['nature', 'hidden-gem'],
     bestTimeToVisit: 'October to May',
     budget: { min: 9000, max: 28000, currency: 'INR' },
@@ -1760,11 +1760,11 @@ export const destinations: Destination[] = [
     description: 'A vibrant port city blending colonial heritage, modern culture, and backwaters.',
     overview: 'Kochi (Cochin) is a major port city with a rich history of Portuguese, Dutch, and British influence. Known for its Chinese fishing nets, Jewish synagogue, Dutch palace, and vibrant art scene.',
     images: [
-      '/images/kochi/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_kochi_tv_destination_img_1_l_793_1194.jpg',
       '/images/kochi/image2.jpg',
       '/images/kochi/image3.jpg'
     ],
-    bannerImage: '/images/kochi/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/desttvimg/mmt/destination/m_kochi_tv_destination_img_1_l_793_1194.jpg',
     category: ['culture', 'heritage'],
     bestTimeToVisit: 'October to March',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -1808,11 +1808,11 @@ export const destinations: Destination[] = [
     description: 'A charming hill station with lush tea gardens, colonial charm, and scenic Nilgiri views.',
     overview: 'Ooty (Udhagamandalam) is the most popular hill station in South India, known for its beautiful tea gardens, eucalyptus forests, the Nilgiri Mountain Railway, and pleasant climate year-round.',
     images: [
-      '/images/ooty/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/ooty/mmt/destination/m_destination-ooty-landscape_l_400_640.jpg',
       '/images/ooty/image2.jpg',
       '/images/ooty/image3.jpg'
     ],
-    bannerImage: '/images/ooty/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/ooty/mmt/destination/m_destination-ooty-landscape_l_400_640.jpg',
     category: ['hills', 'honeymoon'],
     bestTimeToVisit: 'April to June, September to November',
     budget: { min: 12000, max: 35000, currency: 'INR' },
@@ -1856,11 +1856,11 @@ export const destinations: Destination[] = [
     description: 'A beautiful hill station with a star-shaped lake, waterfalls, and cool climate.',
     overview: 'Kodaikanal is a serene hill station in Tamil Nadu\'s Palani Hills, famous for its pristine lake, waterfalls, dense forests, and breathtaking viewpoints. It\'s a perfect honeymoon destination.',
     images: [
-      '/images/kodaikanal/image1.jpg',
+      'https://hldak.mmtcdn.com/prod-s3-hld-hpcmsadmin/holidays/images/cities/1355/kodaikanal-city.jpg?downsize=328:200',
       '/images/kodaikanal/image2.jpg',
       '/images/kodaikanal/image3.jpg'
     ],
-    bannerImage: '/images/kodaikanal/banner.jpg',
+    bannerImage: 'https://hldak.mmtcdn.com/prod-s3-hld-hpcmsadmin/holidays/images/cities/1355/kodaikanal-city.jpg?downsize=328:200',
     category: ['hills', 'honeymoon'],
     bestTimeToVisit: 'April to June, September to November',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -1904,11 +1904,11 @@ export const destinations: Destination[] = [
     description: 'Famous for its grand palace, rich heritage, silk sarees, and delicious sweets.',
     overview: 'Mysore is a historic city known for the magnificent Mysore Palace, vibrant Dasara festival, Chamundi Hills, and its rich cultural heritage. It\'s a perfect blend of tradition and modernity.',
     images: [
-      '/images/mysore/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/mysore/mmt/activities/m_Mysore%20Palace_1_l_445_666.jpg?im=Resize=(412,347.56)',
       '/images/mysore/image2.jpg',
       '/images/mysore/image3.jpg'
     ],
-    bannerImage: '/images/mysore/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/mysore/mmt/activities/m_Mysore%20Palace_1_l_445_666.jpg?im=Resize=(412,347.56)',
     category: ['heritage', 'culture'],
     bestTimeToVisit: 'October to March',
     budget: { min: 9000, max: 28000, currency: 'INR' },
@@ -1952,11 +1952,11 @@ export const destinations: Destination[] = [
     description: 'A UNESCO World Heritage site with ancient temples, ruins, and boulder-strewn landscapes.',
     overview: 'Hampi is an ancient village with the ruins of the Vijayanagara Empire, spread across a stunning landscape of giant boulders. It\'s a UNESCO World Heritage site and a paradise for history lovers and backpackers.',
     images: [
-      '/images/hampi/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Hampi_tv_destination_img_1_l_903_1440.jpg',
       '/images/hampi/image2.jpg',
       '/images/hampi/image3.jpg'
     ],
-    bannerImage: '/images/hampi/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/tvdestinationimages/mmt/activities/m_Hampi_tv_destination_img_1_l_903_1440.jpg',
     category: ['heritage', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -2000,11 +2000,11 @@ export const destinations: Destination[] = [
     description: 'A laid-back temple town with pristine beaches, perfect for relaxation and beach trekking.',
     overview: 'Gokarna is a small temple town known for its beautiful, less-crowded beaches, relaxed vibe, and backpacker culture. It offers a perfect alternative to Goa with a more spiritual atmosphere.',
     images: [
-      '/images/gokarna/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/gokarna/mmt/activities/m_activities_gokarna_murdeshwar_l_445_636.jpg',
       '/images/gokarna/image2.jpg',
       '/images/gokarna/image3.jpg'
     ],
-    bannerImage: '/images/gokarna/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/gokarna/mmt/activities/m_activities_gokarna_murdeshwar_l_445_636.jpg',
     category: ['beaches', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 7000, max: 22000, currency: 'INR' },
@@ -2048,11 +2048,11 @@ export const destinations: Destination[] = [
     description: 'A stunning hill station famous for coffee plantations, misty hills, and waterfalls.',
     overview: 'Coorg (Kodagu) is a beautiful hill station in Karnataka known for its coffee estates, spice plantations, lush forests, and pleasant climate. It\'s a perfect destination for nature lovers and adventure seekers.',
     images: [
-      '/images/coorg/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/coorg/mmt/destination/m_Coorg_activity_trekking_l_495_743.jpg',
       '/images/coorg/image2.jpg',
       '/images/coorg/image3.jpg'
     ],
-    bannerImage: '/images/coorg/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/coorg/mmt/destination/m_Coorg_activity_trekking_l_495_743.jpg',
     category: ['coffee', 'nature', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 10000, max: 35000, currency: 'INR' },
@@ -2096,11 +2096,11 @@ export const destinations: Destination[] = [
     description: 'A charming coastal town with French colonial architecture, serene beaches, and spiritual vibes.',
     overview: 'Pondicherry (Puducherry) is a unique blend of French and Tamil culture, known for its colonial buildings, promenade beach, Auroville, and relaxed lifestyle. It\'s a perfect getaway for culture and beach lovers.',
     images: [
-      '/images/pondicherry/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_pondicherry_main_tv_destination_img_1_l_761_1376.jpg',
       '/images/pondicherry/image2.jpg',
       '/images/pondicherry/image3.jpg'
     ],
-    bannerImage: '/images/pondicherry/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_pondicherry_main_tv_destination_img_1_l_761_1376.jpg',
     category: ['beaches', 'french culture'],
     bestTimeToVisit: 'October to March',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -2144,11 +2144,11 @@ export const destinations: Destination[] = [
     description: 'Famous for its tea gardens, stunning Kanchenjunga views, and the iconic toy train.',
     overview: 'Darjeeling is a breathtaking hill station in West Bengal, known for its sprawling tea estates, the UNESCO World Heritage Darjeeling Himalayan Railway, and panoramic views of Mount Kanchenjunga, the world\'s third-highest peak.',
     images: [
-      '/images/darjeeling/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/darjeeling/mmt/destination/m_landscape_l_400_640.jpg',
       '/images/darjeeling/image2.jpg',
       '/images/darjeeling/image3.jpg'
     ],
-    bannerImage: '/images/darjeeling/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/darjeeling/mmt/destination/m_landscape_l_400_640.jpg',
     category: ['tea', 'mountains'],
     bestTimeToVisit: 'April to June, October to November',
     budget: { min: 10000, max: 35000, currency: 'INR' },
@@ -2193,11 +2193,11 @@ export const destinations: Destination[] = [
     description: 'The world\'s largest mangrove forest, home to the Royal Bengal Tiger and unique ecosystem.',
     overview: 'The Sundarbans is a UNESCO World Heritage site, the largest mangrove forest in the world, and a unique ecosystem. It\'s famous for the Royal Bengal Tiger, saltwater crocodiles, spotted deer, and numerous bird species.',
     images: [
-      '/images/sundarbans/image1.jpg',
+      'https://static.toiimg.com/photo/112952814.cms',
       '/images/sundarbans/image2.jpg',
       '/images/sundarbans/image3.jpg'
     ],
-    bannerImage: '/images/sundarbans/banner.jpg',
+    bannerImage: 'https://static.toiimg.com/photo/112952814.cms',
     category: ['wildlife', 'hidden-gem'],
     bestTimeToVisit: 'October to March',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -2241,11 +2241,11 @@ export const destinations: Destination[] = [
     description: 'UNESCO World Heritage site famous for the Great Indian One-Horned Rhinoceros.',
     overview: 'Kaziranga National Park is a UNESCO World Heritage site and one of India\'s most successful wildlife conservation stories. It has the largest population of the Great Indian One-Horned Rhinoceros, along with elephants, tigers, and wild water buffalo.',
     images: [
-      '/images/kaziranga/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/kaziranga/mmt/destination/m_Kaziranga_l_456_683.jpg',
       '/images/kaziranga/image2.jpg',
       '/images/kaziranga/image3.jpg'
     ],
-    bannerImage: '/images/kaziranga/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/kaziranga/mmt/destination/m_Kaziranga_l_456_683.jpg',
     category: ['wildlife', 'hidden-gem'],
     bestTimeToVisit: 'November to April',
     budget: { min: 12000, max: 35000, currency: 'INR' },
@@ -2289,11 +2289,11 @@ export const destinations: Destination[] = [
     description: 'A charming hill station with rolling hills, waterfalls, and a unique music culture.',
     overview: 'Shillong, the capital of Meghalaya, is a beautiful hill station known for its pine-covered hills, stunning waterfalls, colonial architecture, and vibrant music scene. It\'s often called the "Rock Capital of India" due to its musical heritage.',
     images: [
-      '/images/shillong/image1.jpg',
+      'https://hldak.mmtcdn.com/prod-s3-hld-hpcmsadmin/holidays/images/cities/1354/SHILLONG.jpg',
       '/images/shillong/image2.jpg',
       '/images/shillong/image3.jpg'
     ],
-    bannerImage: '/images/shillong/banner.jpg',
+    bannerImage: 'https://hldak.mmtcdn.com/prod-s3-hld-hpcmsadmin/holidays/images/cities/1354/SHILLONG.jpg',
     category: ['nature', 'hidden-gem'],
     bestTimeToVisit: 'October to April',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -2339,11 +2339,11 @@ export const destinations: Destination[] = [
     description: 'One of the wettest places on Earth, famous for living root bridges and stunning waterfalls.',
     overview: 'Cherrapunji (Sohra) is known for being one of the wettest places on Earth. It\'s famous for its unique living root bridges, spectacular waterfalls, limestone caves, and pristine natural beauty. The living root bridges are a UNESCO World Heritage site contender.',
     images: [
-      '/images/cherrapunji/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/cherrapunji/mmt/activities/m_activities_cherrapunji_Thangkharang_Park_l_360_640.jpg',
       '/images/cherrapunji/image2.jpg',
       '/images/cherrapunji/image3.jpg'
     ],
-    bannerImage: '/images/cherrapunji/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/cherrapunji/mmt/activities/m_activities_cherrapunji_Thangkharang_Park_l_360_640.jpg',
     category: ['waterfalls', 'hidden-gem'],
     bestTimeToVisit: 'October to April',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -2388,11 +2388,11 @@ export const destinations: Destination[] = [
     description: 'A breathtaking city of lakes, houseboats, Mughal gardens, and floating markets in the Kashmir Valley.',
     overview: 'Srinagar, the summer capital of Jammu & Kashmir, is renowned for its stunning Dal Lake, charming houseboats, beautiful Mughal gardens, and the unique floating market. Set against the backdrop of the Himalayas, it offers a truly magical experience with its shikara rides, Mughal architecture, and rich Kashmiri culture.',
     images: [
-      '/images/srinagar/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/new_dest_imagemar/mmt/activities/m_Srinagar_4_l_800_1200.jpg',
       '/images/srinagar/image2.jpg',
       '/images/srinagar/image3.jpg'
     ],
-    bannerImage: '/images/srinagar/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/new_dest_imagemar/mmt/activities/m_Srinagar_4_l_800_1200.jpg',
     category: ['lakes', 'mountains', 'honeymoon'],
     bestTimeToVisit: 'April to October (summer), December to February (snow)',
     budget: { min: 12000, max: 40000, currency: 'INR' },
@@ -2444,11 +2444,11 @@ export const destinations: Destination[] = [
     description: 'A stunning hill station famous for skiing, the world\'s second-highest gondola ride, and snow-capped peaks.',
     overview: 'Gulmarg is a premier hill station in Kashmir, known for its beautiful meadows covered with flowers in summer and pristine snow in winter. It offers the world\'s second-highest gondola cable car, excellent skiing slopes, and breathtaking views of Nanga Parbat and other Himalayan peaks.',
     images: [
-      '/images/gulmarg/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/gulmarg/mmt/destination/m_destination-gulmarg-landscape_l_400_640.jpg?im=Resize=(412,412)',
       '/images/gulmarg/image2.jpg',
       '/images/gulmarg/image3.jpg'
     ],
-    bannerImage: '/images/gulmarg/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/gulmarg/mmt/destination/m_destination-gulmarg-landscape_l_400_640.jpg?im=Resize=(412,412)',
     category: ['mountains', 'adventure', 'snow'],
     bestTimeToVisit: 'May to October (summer), December to February (skiing)',
     budget: { min: 15000, max: 45000, currency: 'INR' },
@@ -2492,11 +2492,11 @@ export const destinations: Destination[] = [
     description: 'A picturesque hill station on the banks of Lidder River, known for scenic valleys and trekking bases.',
     overview: 'Pahalgam is a beautiful town in the Anantnag district, set along the Lidder River. It serves as the base camp for the Amarnath Yatra and offers stunning landscapes, pine forests, and excellent trekking routes. The lush green Betaab Valley and Aru Valley are nearby attractions.',
     images: [
-      '/images/pahalgam/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Pahalgam_tv_destination_img_1_l_829_1473.jpg',
       '/images/pahalgam/image2.jpg',
       '/images/pahalgam/image3.jpg'
     ],
-    bannerImage: '/images/pahalgam/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/destimg/mmt/destination/m_Pahalgam_tv_destination_img_1_l_829_1473.jpg',
     category: ['mountains', 'nature', 'trekking'],
     bestTimeToVisit: 'April to October',
     budget: { min: 12000, max: 35000, currency: 'INR' },
@@ -2541,11 +2541,11 @@ export const destinations: Destination[] = [
     description: 'A breathtaking hill station with golden meadows, snow-capped peaks, and trekking routes to Himalayan lakes.',
     overview: 'Sonamarg is a stunning hill station in the Ganderbal district, known for its golden-hued meadows, snow-covered peaks, and the Sindh River flowing through. It serves as the base for treks to the famous high-altitude lakes - Gangabal, Vishansar, and Krishansar.',
     images: [
-      '/images/sonamarg/image1.jpg',
+      'https://hblimg.mmtcdn.com/content/hubble/img/maingalleryimgs/mmt/activities/m_Sonmarg_1_l_602_926.jpg',
       '/images/sonamarg/image2.jpg',
       '/images/sonamarg/image3.jpg'
     ],
-    bannerImage: '/images/sonamarg/banner.jpg',
+    bannerImage: 'https://hblimg.mmtcdn.com/content/hubble/img/maingalleryimgs/mmt/activities/m_Sonmarg_1_l_602_926.jpg',
     category: ['mountains', 'trekking', 'snow'],
     bestTimeToVisit: 'June to October',
     budget: { min: 10000, max: 30000, currency: 'INR' },
@@ -2589,11 +2589,11 @@ export const destinations: Destination[] = [
     description: 'One of India\'s holiest pilgrimage destinations, dedicated to Goddess Vaishno Devi in a holy cave.',
     overview: 'Katra is the base camp for the sacred Vaishno Devi Yatra, one of India\'s most visited pilgrimage sites. Devotees trek 13 km to the holy cave shrine of Mata Vaishno Devi nestled in the Trikuta Mountains. The journey is spiritually uplifting with beautiful mountain scenery.',
     images: [
-      '/images/vaishno-devi/image1.jpg',
+      'https://www.maavaishnodevi.live/assets-new/images/home-slider/6.webp',
       '/images/vaishno-devi/image2.jpg',
       '/images/vaishno-devi/image3.jpg'
     ],
-    bannerImage: '/images/vaishno-devi/banner.jpg',
+    bannerImage: 'https://www.maavaishnodevi.live/assets-new/images/home-slider/6.webp',
     category: ['spiritual', 'pilgrimage', 'trekking'],
     bestTimeToVisit: 'March to October',
     budget: { min: 8000, max: 25000, currency: 'INR' },
@@ -2637,11 +2637,11 @@ export const destinations: Destination[] = [
     description: 'One of the holiest Hindu pilgrimage sites featuring an ice stalagmite that naturally forms a Shiva Lingam.',
     overview: 'The Amarnath Cave is a sacred Hindu pilgrimage site located at 3,888 meters. The shrine houses an ice stalagmite that naturally forms a Shiva Lingam, which waxes and wanes with the moon cycle. The annual Amarnath Yatra takes place during July-August.',
     images: [
-      '/images/amarnath/image1.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/6/66/Cave_Temple_of_Lord_Amarnath.jpg',
       '/images/amarnath/image2.jpg',
       '/images/amarnath/image3.jpg'
     ],
-    bannerImage: '/images/amarnath/banner.jpg',
+    bannerImage: 'https://upload.wikimedia.org/wikipedia/commons/6/66/Cave_Temple_of_Lord_Amarnath.jpg',
     category: ['spiritual', 'pilgrimage', 'trekking'],
     bestTimeToVisit: 'July to August (annual Yatra period only)',
     budget: { min: 15000, max: 40000, currency: 'INR' },
