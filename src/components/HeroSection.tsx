@@ -44,11 +44,11 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="heading-xl text-white mb-6"
         >
-          Your Journey to{' '}
+          Travel India{' '}
           <span className="text-gradient">
-            Incredible India
+          beyond the
           </span>{' '}
-          Starts Here
+         tourist map
         </motion.h1>
 
         <motion.p

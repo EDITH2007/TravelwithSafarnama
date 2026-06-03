@@ -4,14 +4,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Sun, Moon, User } from 'lucide-react'
 import { useThemeStore } from '../stores/themeStore'
 
+// AFTER:
 const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Destinations', path: '/destinations' },
-    { name: 'Blogs', path: '/blogs' },
-    { name: 'Trip Planner', path: '/trip-planner' },
-    { name: 'Gallery', path: '/gallery' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+  { name: 'Home', path: '/' },
+  { name: 'Destinations', path: '/destinations' },
+  { name: 'Journeys', path: '/journeys' },
+  { name: 'Road Trips', path: '/road-trips' },
+  { name: 'Gallery', path: '/gallery' },
+  { name: 'Blogs', path: '/blogs' },
+  { name: 'Trip Planner', path: '/trip-planner' },
 ]
 
 export default function Navbar() {

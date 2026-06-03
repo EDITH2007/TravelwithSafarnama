@@ -33,8 +33,8 @@ export default function Footer() {
                         <div className="lg:col-span-2">
                             <Link to="/" className="flex items-center gap-3 mb-6">
                                 <img
-                                    src="public/logo_05.png"
-                                    alt="SafarNama Logo"
+                                    src="/logo_05.png"
+                                    alt="SafarNama"
                                     className="w-30 h-12 rounded-lg object-cover"
                                 />
                                 <div>

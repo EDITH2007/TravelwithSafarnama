@@ -1,4 +1,5 @@
 import HeroSection from '../components/HeroSection'
+import FeaturedJourneysSection from '../components/FeaturedJourneysSection'
 import FeaturedDestinations from '../components/FeaturedDestinations'
 import CategoriesSection from '../components/CategoriesSection'
 import HiddenGemsSection from '../components/HiddenGemsSection'
@@ -9,6 +10,7 @@ export default function HomePage() {
   return (
     <main>
       <HeroSection />
+      <FeaturedJourneysSection />
       <FeaturedDestinations />
       <CategoriesSection />
       <HiddenGemsSection />

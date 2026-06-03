@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { Mountain, Waves, Church, Tent, Gem, Heart, Bike } from 'lucide-react'
+import { Mountain, Waves, Church, Tent, Gem, Heart } from 'lucide-react'
 
 const categories = [
   { name: 'Mountains', icon: Mountain, color: 'from-blue-500 to-blue-700', count: 45 },
@@ -9,7 +9,6 @@ const categories = [
   { name: 'Adventure', icon: Tent, color: 'from-gray-500 to-gray-700', count: 38 },
   { name: 'Hidden Gems', icon: Gem, color: 'from-blue-600 to-orange-500', count: 24 },
   { name: 'Honeymoon', icon: Heart, color: 'from-orange-500 to-blue-600', count: 20 },
-  { name: 'Road Trips', icon: Bike, color: 'from-sky-500 to-cyan-700', count: 8 },
 ]
 
 export default function CategoriesSection() {
