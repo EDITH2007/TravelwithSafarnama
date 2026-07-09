@@ -12,6 +12,18 @@ export interface User {
   phone: string;
 }
 
+export interface VisitedLog {
+  slug: string;
+  rating: number;
+  expense: number;
+  visitedHighlights: string;
+  foodName: string;
+  foodRating: number;
+  weather: string;
+  experience: string;
+  date: number;
+}
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -35,11 +47,30 @@ interface AuthContextType {
   visitedPlaces: string[];
   toggleVisitedPlace: (slug: string) => void;
   isPlaceVisited: (slug: string) => boolean;
+  
+  // Detailed Visited Logs
+  visitedLogs: VisitedLog[];
+  addVisitedLog: (
+    slug: string, 
+    rating: number, 
+    expense: number, 
+    visitedHighlights: string, 
+    foodName: string, 
+    foodRating: number, 
+    weather: string, 
+    experience: string
+  ) => void;
+  removeVisitedLog: (slug: string) => void;
+  activeVisitLoggingSlug: string | null;
+  setActiveVisitLoggingSlug: (slug: string | null) => void;
 
   // Expenses
   expenses: any[];
   addExpense: (amount: number, category: string, description: string) => void;
   deleteExpense: (id: string) => void;
+
+  // Travel Score Gamification
+  travelScore: number;
 
   // Shared Website Data (Blogs, Gallery, Testimonials)
   blogs: any[];
@@ -265,7 +296,9 @@ async function calculateImageAestheticScore(src: string): Promise<number> {
       }
     };
     img.onerror = () => {
-      resolve(0); // Failed to load
+      // Fallback if image fails to load or URL is CORS-blocked (accept any URL, fallback score)
+      const fallbackScore = 180 + Math.floor(Math.random() * 60);
+      resolve(fallbackScore);
     };
   });
 }
@@ -279,7 +312,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [savedDestinations, setSavedDestinations] = useState<string[]>([]);
   const [tripPlans, setTripPlans] = useState<any[]>([]);
   const [visitedPlaces, setVisitedPlaces] = useState<string[]>([]);
+  const [visitedLogs, setVisitedLogs] = useState<VisitedLog[]>([]);
+  const [activeVisitLoggingSlug, setActiveVisitLoggingSlug] = useState<string | null>(null);
   const [expenses, setExpenses] = useState<any[]>([]);
+
+  // Travel score state
+  const [travelScore, setTravelScore] = useState(0);
 
   // Shared Global Data states
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -298,7 +336,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setBlogs(savedBlogs ? JSON.parse(savedBlogs) : defaultBlogs);
 
     const savedPhotos = localStorage.getItem('safarnama-global-all-photos');
-    setAllPhotos(savedPhotos ? JSON.parse(savedPhotos) : []); // Gallery starts completely empty as requested!
+    setAllPhotos(savedPhotos ? JSON.parse(savedPhotos) : []); 
 
     const savedExperiences = localStorage.getItem('safarnama-global-experiences');
     setExperiences(savedExperiences ? JSON.parse(savedExperiences) : defaultTestimonials);
@@ -323,16 +361,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setGalleryPhotos(Object.values(locationsMap));
   }, [allPhotos]);
 
+  // Compute travel score dynamically
+  useEffect(() => {
+    if (!user) {
+      setTravelScore(0);
+      return;
+    }
+    
+    // Visited places: +100 points
+    const visitedPoints = visitedPlaces.length * 100;
+
+    // Detailed logs check: +50 points per detailed visit log
+    const detailedCount = visitedLogs.filter(
+      (l) => l.visitedHighlights || l.foodName || l.experience
+    ).length;
+    const logBonus = detailedCount * 50;
+
+    // Blogs created: +200 points
+    const userBlogsCount = blogs.filter((b) => b.uploadedByUsername === user.username).length;
+    const blogPoints = userBlogsCount * 200;
+
+    // Experiences shared: +150 points
+    const userStoriesCount = experiences.filter((e) => e.uploadedByUsername === user.username).length;
+    const storyPoints = userStoriesCount * 150;
+
+    setTravelScore(visitedPoints + logBonus + blogPoints + storyPoints);
+  }, [user, visitedPlaces, visitedLogs, blogs, experiences]);
+
   // Load user data helper
   const loadUserData = (userId: string) => {
     const saved = localStorage.getItem(`safarnama-saved-${userId}`);
     const trips = localStorage.getItem(`safarnama-trips-${userId}`);
     const visited = localStorage.getItem(`safarnama-visited-${userId}`);
+    const logs = localStorage.getItem(`safarnama-visitedlogs-${userId}`);
     const exp = localStorage.getItem(`safarnama-expenses-${userId}`);
 
     setSavedDestinations(saved ? JSON.parse(saved) : []);
     setTripPlans(trips ? JSON.parse(trips) : []);
     setVisitedPlaces(visited ? JSON.parse(visited) : []);
+    setVisitedLogs(logs ? JSON.parse(logs) : []);
     setExpenses(exp ? JSON.parse(exp) : []);
   };
 
@@ -344,6 +411,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSavedDestinations([]);
       setTripPlans([]);
       setVisitedPlaces([]);
+      setVisitedLogs([]);
       setExpenses([]);
     }
   }, [user]);
@@ -428,7 +496,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     toast.success('Trip plan deleted');
   };
 
-  // Visited Places Helpers
+  // Visited Places & Detailed Visited Logs
   const isPlaceVisited = (slug: string) => visitedPlaces.includes(slug);
 
   const toggleVisitedPlace = (slug: string) => {
@@ -436,16 +504,81 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.error('Please sign in to log visited places');
       return;
     }
-    const updated = visitedPlaces.includes(slug)
-      ? visitedPlaces.filter((s) => s !== slug)
-      : [...visitedPlaces, slug];
-    setVisitedPlaces(updated);
-    localStorage.setItem(`safarnama-visited-${user._id}`, JSON.stringify(updated));
     if (visitedPlaces.includes(slug)) {
-      toast('Place removed from visited log');
+      removeVisitedLog(slug);
     } else {
-      toast.success('Logged as visited place! 📍');
+      setActiveVisitLoggingSlug(slug);
+      toast('Let\'s add some travel details for your visit! 📝');
+      if (window.location.pathname !== '/dashboard') {
+        window.location.href = '/dashboard';
+      }
     }
+  };
+
+  const addVisitedLog = (
+    slug: string, 
+    rating: number, 
+    expense: number, 
+    visitedHighlights: string, 
+    foodName: string, 
+    foodRating: number, 
+    weather: string, 
+    experience: string
+  ) => {
+    if (!user) return;
+
+    // 1. Add to visitedPlaces if not already present
+    let updatedPlaces = [...visitedPlaces];
+    if (!visitedPlaces.includes(slug)) {
+      updatedPlaces.push(slug);
+      setVisitedPlaces(updatedPlaces);
+      localStorage.setItem(`safarnama-visited-${user._id}`, JSON.stringify(updatedPlaces));
+    }
+
+    // 2. Add or update the visited log item
+    const newLog: VisitedLog = {
+      slug,
+      rating,
+      expense,
+      visitedHighlights,
+      foodName,
+      foodRating,
+      weather,
+      experience,
+      date: Date.now()
+    };
+
+    const existingIndex = visitedLogs.findIndex((log) => log.slug === slug);
+    let updatedLogs = [...visitedLogs];
+    if (existingIndex > -1) {
+      updatedLogs[existingIndex] = newLog;
+    } else {
+      updatedLogs.push(newLog);
+    }
+    setVisitedLogs(updatedLogs);
+    localStorage.setItem(`safarnama-visitedlogs-${user._id}`, JSON.stringify(updatedLogs));
+
+    // 3. Remove from wishlist/saved destinations automatically if it is there!
+    if (savedDestinations.includes(slug)) {
+      const updatedSaved = savedDestinations.filter((s) => s !== slug);
+      setSavedDestinations(updatedSaved);
+      localStorage.setItem(`safarnama-saved-${user._id}`, JSON.stringify(updatedSaved));
+    }
+
+    toast.success('Visited place details logged! Wishlist updated. 📍');
+  };
+
+  const removeVisitedLog = (slug: string) => {
+    if (!user) return;
+    const updatedPlaces = visitedPlaces.filter((s) => s !== slug);
+    setVisitedPlaces(updatedPlaces);
+    localStorage.setItem(`safarnama-visited-${user._id}`, JSON.stringify(updatedPlaces));
+
+    const updatedLogs = visitedLogs.filter((l) => l.slug !== slug);
+    setVisitedLogs(updatedLogs);
+    localStorage.setItem(`safarnama-visitedlogs-${user._id}`, JSON.stringify(updatedLogs));
+
+    toast.success('Trip visit removed');
   };
 
   // Expenses Helpers
@@ -543,7 +676,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // --- EXPERIENCE SHARING WITH STORY QUALITY RANKING ---
-  const addExperience = (text: string, rating: number, destination: string, travelerLocation: string) => {
+  const addExperience = (text: string, rating: number, destination: string, location: string) => {
     if (!user) {
       toast.error('Please sign in to share your story');
       return;
@@ -553,7 +686,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: `exp-story-${Date.now()}`,
       name: user.name,
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
-      location: travelerLocation || 'Traveler',
+      location: location || 'Traveler',
       rating,
       text,
       destination,
@@ -782,9 +915,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         visitedPlaces,
         toggleVisitedPlace,
         isPlaceVisited,
+        visitedLogs,
+        addVisitedLog,
+        removeVisitedLog,
+        activeVisitLoggingSlug,
+        setActiveVisitLoggingSlug,
         expenses,
         addExpense,
         deleteExpense,
+        travelScore,
         blogs,
         addBlog,
         allPhotos,

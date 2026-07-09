@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { 
   Heart, MapPin, User, Phone, Lock, Eye, EyeOff, 
   Edit3, LogOut, X, Compass, DollarSign, Calendar, 
-  TrendingUp, Plus, Trash, Star, Briefcase, ChevronRight,
+  Plus, Trash, Star, Briefcase, ChevronRight,
   Camera, BookOpen, Send
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -16,7 +16,10 @@ export default function DashboardPage() {
     savedDestinations, toggleSaveDestination,
     tripPlans, deleteTripPlan,
     visitedPlaces, toggleVisitedPlace,
+    visitedLogs, addVisitedLog,
+    activeVisitLoggingSlug, setActiveVisitLoggingSlug,
     expenses, addExpense, deleteExpense,
+    travelScore,
     addBlog,
     allPhotos, uploadGalleryPhoto,
     addExperience
@@ -37,7 +40,7 @@ export default function DashboardPage() {
   const [editPhone, setEditPhone] = useState('');
 
   // Dashboard Nav Tab state
-  const [activeTab, setActiveTab] = useState<'overview' | 'wishlist' | 'trips' | 'expenses' | 'share' | 'write' | 'profile'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'wishlist' | 'visitedPlacesTab' | 'trips' | 'expenses' | 'share' | 'write' | 'profile'>('overview');
 
   // Segment sub-tab inside Dashboard Overview
   const [overviewSubTab, setOverviewSubTab] = useState<'wishlist' | 'visited'>('wishlist');
@@ -83,12 +86,6 @@ export default function DashboardPage() {
 
   // Calculate statistics
   const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
-  const budgetLimit = 50000;
-  const remainingBudget = Math.max(0, budgetLimit - totalSpent);
-  
-  const averageRating = savedDestinationsData.length > 0 
-    ? (savedDestinationsData.reduce((sum, d) => sum + (d?.rating || 0), 0) / savedDestinationsData.length).toFixed(1)
-    : '0.0';
 
   // Find user's active uploaded photo (max 1 photo constraint)
   const userPhoto = allPhotos.find((p) => p.uploadedByUsername === user?.username);
@@ -171,6 +168,16 @@ export default function DashboardPage() {
     setBlogCoverImage('');
     setBlogContent('');
   };
+
+
+
+  function getTravelBadge(score: number): string {
+    if (score >= 1200) return 'Globetrotter'
+    if (score >= 800) return 'Pathfinder'
+    if (score >= 400) return 'Explorer'
+    if (score >= 200) return 'Wanderer'
+    return 'Novice'
+  }
 
   if (isLoading) {
     return (
@@ -347,16 +354,11 @@ export default function DashboardPage() {
               </form>
             </motion.div>
           ) : (
-            /* --- AUTHENTICATED: Premium Dashboard Layout --- */
-            <motion.div
-              key="dashboard-dashboard"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col lg:flex-row gap-8 mt-4"
-            >
+            /* --- AUTHENTICATED: Premium Redesigned Dashboard Layout --- */
+            <div className="flex flex-col lg:flex-row gap-8 mt-4">
+              
               {/* --- LEFT SIDEBAR (Floating Glass Sidebar) --- */}
-              <aside className="w-full lg:w-64 shrink-0 bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200/50 dark:border-gray-800/40 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+              <aside className="w-full lg:w-64 shrink-0 bg-white/70 dark:bg-gray-900/60 backdrop-blur-xl border border-gray-200/50 dark:border-gray-800/40 rounded-3xl p-6 shadow-sm flex flex-col justify-between h-fit">
                 <div className="space-y-6">
                   {/* User Profile Mini Card */}
                   <div className="flex items-center gap-3 pb-4 border-b border-gray-200/50 dark:border-gray-800/40">
@@ -374,6 +376,7 @@ export default function DashboardPage() {
                     {[
                       { id: 'overview', name: 'Dashboard', icon: Compass },
                       { id: 'wishlist', name: 'Wishlist', icon: Heart, badge: savedDestinations.length },
+                      { id: 'visitedPlacesTab', name: 'Visited Places', icon: MapPin, badge: visitedPlaces.length },
                       { id: 'trips', name: 'My Trip Plans', icon: Briefcase, badge: tripPlans.length },
                       { id: 'expenses', name: 'Expense Tracker', icon: DollarSign },
                       { id: 'share', name: 'Share Photo & Story', icon: Camera },
@@ -423,6 +426,28 @@ export default function DashboardPage() {
 
               {/* --- RIGHT WINDOW CONTENT --- */}
               <div className="flex-1 space-y-6">
+                
+                {/* --- REDESIGNED WELCOME BANNER WITH BG COVER IMAGE --- */}
+                <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 p-8 text-white shadow-md min-h-[190px] flex flex-col justify-end">
+                  {/* Backdrop canvas empty decoration background */}
+                  <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200')] bg-cover bg-center opacity-30 mix-blend-overlay" />
+                  
+                  {/* Dynamic travel score pill */}
+                  <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-md text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-md">
+                    👑 Travel Score: {travelScore} XP
+                  </div>
+
+                  <div className="relative z-10 space-y-2">
+                    <span className="text-[10px] uppercase tracking-widest font-extrabold text-blue-200">Welcome Back Traveler,</span>
+                    <h2 className="text-3xl md:text-4xl font-black">{user.name}</h2>
+                    <p className="text-xs text-blue-100 font-semibold flex items-center gap-2">
+                      <span>@{user.username}</span>
+                      <span>•</span>
+                      <span>Level {Math.floor(travelScore / 400) + 1} {getTravelBadge(travelScore)}</span>
+                    </p>
+                  </div>
+                </div>
+
                 <AnimatePresence mode="wait">
                   {/* OVERVIEW TAB */}
                   {activeTab === 'overview' && (
@@ -556,7 +581,13 @@ export default function DashboardPage() {
                                             {dest?.rating}
                                           </div>
                                         </td>
-                                        <td className="py-3.5 text-right">
+                                        <td className="py-3.5 text-right flex gap-3 justify-end items-center">
+                                          <button 
+                                            onClick={() => dest && toggleVisitedPlace(dest.slug)}
+                                            className="text-xs text-blue-600 hover:underline font-semibold"
+                                          >
+                                            Log Visit
+                                          </button>
                                           <button 
                                             onClick={() => dest && toggleSaveDestination(dest.slug)}
                                             className="text-xs text-red-500 hover:underline font-semibold"
@@ -592,36 +623,45 @@ export default function DashboardPage() {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {visitedDestinationsData.slice(0, 5).map((dest, idx) => (
-                                      <tr key={dest?.slug} className="border-b border-gray-100/50 dark:border-gray-900/50 last:border-none group">
-                                        <td className="py-3.5 text-gray-400 font-medium">{idx + 1}</td>
-                                        <td className="py-3.5 pr-4 font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                                          <img 
-                                            src={dest?.bannerImage || dest?.images[0]} 
-                                            alt={dest?.name} 
-                                            className="w-10 h-8 rounded-lg object-cover"
-                                          />
-                                          <Link to={`/destinations/${dest?.slug}`} className="hover:text-blue-600 transition-colors">
-                                            {dest?.name}
-                                          </Link>
-                                        </td>
-                                        <td className="py-3.5 pr-4 text-gray-500 dark:text-gray-400">{dest?.state}</td>
-                                        <td className="py-3.5 pr-4 font-bold text-gray-700 dark:text-gray-300">
-                                          <div className="flex items-center gap-1 text-orange-500">
-                                            <Star className="w-3.5 h-3.5 fill-orange-500" />
-                                            {dest?.rating}
-                                          </div>
-                                        </td>
-                                        <td className="py-3.5 text-right">
-                                          <button 
-                                            onClick={() => dest && toggleVisitedPlace(dest.slug)}
-                                            className="text-xs text-red-500 hover:underline font-semibold"
-                                          >
-                                            Remove log
-                                          </button>
-                                        </td>
-                                      </tr>
-                                    ))}
+                                    {visitedDestinationsData.slice(0, 5).map((dest, idx) => {
+                                      const log = visitedLogs.find((l) => l.slug === dest?.slug);
+                                      return (
+                                        <tr key={dest?.slug} className="border-b border-gray-100/50 dark:border-gray-900/50 last:border-none group">
+                                          <td className="py-3.5 text-gray-400 font-medium">{idx + 1}</td>
+                                          <td className="py-3.5 pr-4 font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                                            <img 
+                                              src={dest?.bannerImage || dest?.images[0]} 
+                                              alt={dest?.name} 
+                                              className="w-10 h-8 rounded-lg object-cover"
+                                            />
+                                            <Link to={`/destinations/${dest?.slug}`} className="hover:text-blue-600 transition-colors">
+                                              {dest?.name}
+                                            </Link>
+                                          </td>
+                                          <td className="py-3.5 pr-4 text-gray-500 dark:text-gray-400">{dest?.state}</td>
+                                          <td className="py-3.5 pr-4">
+                                            <div className="flex items-center gap-1 text-orange-500 font-semibold text-xs">
+                                              <Star className="w-3.5 h-3.5 fill-orange-500" />
+                                              {log ? `${log.rating} (Logged)` : `${dest?.rating} (Avg)`}
+                                            </div>
+                                          </td>
+                                          <td className="py-3.5 text-right flex gap-3 justify-end items-center">
+                                            <button 
+                                              onClick={() => dest && setActiveVisitLoggingSlug(dest.slug)}
+                                              className="text-xs text-blue-600 hover:underline font-semibold"
+                                            >
+                                              {log ? 'Edit Log' : 'Add Log'}
+                                            </button>
+                                            <button 
+                                              onClick={() => dest && toggleVisitedPlace(dest.slug)}
+                                              className="text-xs text-red-500 hover:underline font-semibold"
+                                            >
+                                              Remove
+                                            </button>
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
                                   </tbody>
                                 </table>
                               </div>
@@ -637,11 +677,12 @@ export default function DashboardPage() {
 
                       {/* Right column statistics metrics */}
                       <div className="space-y-6">
-                        {/* Travel Progress */}
-                        <div className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                        
+                        {/* 1. States Visited Progress (Only 1 time featured here!) */}
+                        <div className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-3xl p-6 shadow-sm">
                           <div>
                             <div className="flex justify-between items-center">
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500">States Visited</h4>
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500">Visited States across India</h4>
                               <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full">
                                 {visitedStatesCount} / 28
                               </span>
@@ -657,45 +698,13 @@ export default function DashboardPage() {
                               <span>Target: 28 States</span>
                             </div>
                           </div>
-                          
-                          <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-                            <span className="text-xs font-semibold text-gray-500">Visited Places Log</span>
-                            <span className="text-xs font-bold text-gray-900 dark:text-white">{visitedPlaces.length} Places</span>
+                          <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs font-semibold text-gray-500">
+                            <span>Total Visited Locations</span>
+                            <span className="text-gray-950 dark:text-white font-bold">{visitedPlaces.length} Places</span>
                           </div>
                         </div>
 
-                        {/* Grid metrics */}
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-4 shadow-sm relative group overflow-hidden">
-                            <DollarSign className="w-5 h-5 text-green-500 absolute top-4 right-4" />
-                            <h4 className="text-[10px] uppercase font-bold tracking-wider text-gray-500">Money Expense</h4>
-                            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">₹{totalSpent.toLocaleString()}</p>
-                            <span className="text-[9px] text-gray-400 mt-1 block">Logged expenses</span>
-                          </div>
-
-                          <div className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-4 shadow-sm relative group overflow-hidden">
-                            <TrendingUp className="w-5 h-5 text-indigo-500 absolute top-4 right-4" />
-                            <h4 className="text-[10px] uppercase font-bold tracking-wider text-gray-500">Trip Budget</h4>
-                            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">₹{remainingBudget.toLocaleString()}</p>
-                            <span className="text-[9px] text-gray-400 mt-1 block">Of ₹{budgetLimit.toLocaleString()} limit</span>
-                          </div>
-
-                          <div className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-4 shadow-sm relative group overflow-hidden">
-                            <MapPin className="w-5 h-5 text-blue-500 absolute top-4 right-4" />
-                            <h4 className="text-[10px] uppercase font-bold tracking-wider text-gray-500">Visited States</h4>
-                            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">{visitedStatesCount}</p>
-                            <span className="text-[9px] text-gray-400 mt-1 block">Across India</span>
-                          </div>
-
-                          <div className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-4 shadow-sm relative group overflow-hidden">
-                            <Star className="w-5 h-5 text-orange-400 fill-orange-400 absolute top-4 right-4" />
-                            <h4 className="text-[10px] uppercase font-bold tracking-wider text-gray-500">Average Rating</h4>
-                            <p className="text-lg font-bold text-gray-900 dark:text-white mt-1">{averageRating}</p>
-                            <span className="text-[9px] text-gray-400 mt-1 block">Wishlist avg score</span>
-                          </div>
-                        </div>
-
-                        {/* Trip Planner Banner */}
+                        {/* 4. AI Itinerary Planner banner */}
                         <div className="bg-gradient-to-br from-indigo-900 to-slate-900 dark:from-slate-900 dark:to-black text-white rounded-3xl p-6 shadow-md relative overflow-hidden flex flex-col justify-between min-h-48 border border-slate-800">
                           <div className="absolute right-0 top-0 w-24 h-24 bg-white/5 rounded-full blur-2xl" />
                           <div>
@@ -751,12 +760,20 @@ export default function DashboardPage() {
                                   <span className="text-xs font-bold text-blue-600">
                                     ₹{dest?.budget.min.toLocaleString()} - ₹{dest?.budget.max.toLocaleString()}
                                   </span>
-                                  <Link 
-                                    to={`/destinations/${dest?.slug}`}
-                                    className="px-3.5 py-1.5 bg-gray-50 dark:bg-gray-800 hover:bg-blue-600 hover:text-white text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold transition-colors"
-                                  >
-                                    Details
-                                  </Link>
+                                  <div className="flex gap-2">
+                                    <button 
+                                      onClick={() => dest && setActiveVisitLoggingSlug(dest.slug)}
+                                      className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors"
+                                    >
+                                      Mark Visited
+                                    </button>
+                                    <Link 
+                                      to={`/destinations/${dest?.slug}`}
+                                      className="px-2.5 py-1.5 bg-gray-50 dark:bg-gray-800 hover:bg-blue-650 hover:text-white text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold transition-colors"
+                                    >
+                                      Details
+                                    </Link>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -769,6 +786,115 @@ export default function DashboardPage() {
                           <Link to="/destinations" className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold mt-4 shadow-sm">
                             Browse Destinations
                           </Link>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* VISITED PLACES TAB VIEW */}
+                  {activeTab === 'visitedPlacesTab' && (
+                    <motion.div
+                      key="tab-visited-places"
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -15 }}
+                      className="space-y-6"
+                    >
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Visited Places & Travel Logs</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Your personal travel log book and detailed trip reviews</p>
+                      </div>
+
+                      {visitedDestinationsData.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {visitedDestinationsData.map((dest) => {
+                            const log = visitedLogs.find((l) => l.slug === dest?.slug);
+                            return (
+                              <div key={dest?.slug} className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group">
+                                <div className="relative h-48 overflow-hidden">
+                                  <img 
+                                    src={dest?.bannerImage || dest?.images[0]} 
+                                    alt={dest?.name} 
+                                    className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                                  />
+                                  <div className="absolute top-3 left-3 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                    Visited
+                                  </div>
+                                  <button 
+                                    onClick={() => dest && toggleVisitedPlace(dest.slug)}
+                                    className="absolute top-3 right-3 p-1.5 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-full shadow-md text-red-500 hover:scale-105 transition-transform"
+                                  >
+                                    <Trash className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                                  <div className="space-y-3">
+                                    <div>
+                                      <span className="text-[10px] text-gray-400 font-semibold uppercase">{dest?.state}</span>
+                                      <h3 className="font-bold text-gray-900 dark:text-white text-lg mt-0.5">{dest?.name}</h3>
+                                    </div>
+
+                                    {log ? (
+                                      <div className="space-y-2.5 text-xs border-t border-gray-100 dark:border-gray-800/60 pt-3">
+                                        <div>
+                                          <span className="font-bold text-gray-500 block">Highlights Visited</span>
+                                          <p className="text-gray-700 dark:text-gray-300 mt-0.5">{log.visitedHighlights}</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 bg-gray-50 dark:bg-gray-950 p-2.5 rounded-xl">
+                                          <div>
+                                            <span className="font-bold text-gray-500 block text-[9px] uppercase">Food Tried</span>
+                                            <p className="text-gray-700 dark:text-gray-300 mt-0.5 truncate">{log.foodName}</p>
+                                            <span className="text-orange-500 font-semibold">{log.foodRating} ⭐</span>
+                                          </div>
+                                          <div>
+                                            <span className="font-bold text-gray-500 block text-[9px] uppercase">Weather / Cost</span>
+                                            <p className="text-gray-700 dark:text-gray-300 mt-0.5">{log.weather}</p>
+                                            <span className="font-bold text-green-600 dark:text-green-400">₹{log.expense}</span>
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <span className="font-bold text-gray-500 block">Travel Log Notes</span>
+                                          <p className="text-gray-700 dark:text-gray-300 italic mt-0.5 leading-relaxed">"{log.experience}"</p>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="text-center py-4 bg-gray-50 dark:bg-gray-950 rounded-xl border border-dashed">
+                                        <p className="text-xs text-gray-400">No log details filled in yet.</p>
+                                        <button 
+                                          onClick={() => dest && setActiveVisitLoggingSlug(dest.slug)} 
+                                          className="text-xs font-bold text-blue-600 hover:underline mt-2"
+                                        >
+                                          Add Trip Details
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {log && (
+                                    <div className="flex justify-between items-center pt-4 border-t border-gray-150 dark:border-gray-800">
+                                      <div className="flex items-center gap-1">
+                                        {[...Array(log.rating)].map((_, i) => (
+                                          <Star key={i} className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
+                                        ))}
+                                      </div>
+                                      <button 
+                                        onClick={() => dest && setActiveVisitLoggingSlug(dest.slug)}
+                                        className="px-3.5 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-semibold transition-all"
+                                      >
+                                        Edit Log
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-center py-20 bg-white dark:bg-gray-950 border border-dashed rounded-3xl">
+                          <MapPin className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">No visited places logged</h3>
+                          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Mark places as visited on destinations page and log details here.</p>
                         </div>
                       )}
                     </motion.div>
@@ -926,7 +1052,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="space-y-6">
                         <div className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-3xl p-6 shadow-sm">
-                          <h3 className="font-bold text-gray-900 dark:text-white mb-4">Budget Progress</h3>
+                          <h3 className="font-bold text-gray-900 dark:text-white mb-4">Budget Limits</h3>
                           <div className="space-y-4">
                             <div>
                               <div className="flex justify-between items-center text-xs font-semibold text-gray-500">
@@ -934,16 +1060,7 @@ export default function DashboardPage() {
                                 <span>₹{totalSpent.toLocaleString()}</span>
                               </div>
                               <div className="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
-                                <div className="h-full bg-red-500 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (totalSpent / budgetLimit) * 100)}%` }} />
-                              </div>
-                            </div>
-                            <div>
-                              <div className="flex justify-between items-center text-xs font-semibold text-gray-500">
-                                <span>Remaining</span>
-                                <span className="text-green-600 font-bold">₹{remainingBudget.toLocaleString()}</span>
-                              </div>
-                              <div className="w-full h-2 bg-gray-100 dark:bg-gray-800 rounded-full mt-2 overflow-hidden">
-                                <div className="h-full bg-green-500 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (remainingBudget / budgetLimit) * 100)}%` }} />
+                                <div className="h-full bg-red-500 rounded-full transition-all duration-500" style={{ width: `${Math.min(100, (totalSpent / 50000) * 100)}%` }} />
                               </div>
                             </div>
                           </div>
@@ -1022,7 +1139,7 @@ export default function DashboardPage() {
                             <div className="space-y-1">
                               <label className="text-xs font-semibold text-gray-500">Image URL</label>
                               <input 
-                                type="url" 
+                                type="text" 
                                 required 
                                 placeholder="https://unsplash.com/..." 
                                 value={photoSrc} 
@@ -1150,7 +1267,7 @@ export default function DashboardPage() {
                         <div className="space-y-1">
                           <label className="text-xs font-semibold text-gray-500">Cover Image URL</label>
                           <input 
-                            type="url" 
+                            type="text" 
                             placeholder="https://images.unsplash.com/photo-..." 
                             value={blogCoverImage} 
                             onChange={(e) => setBlogCoverImage(e.target.value)} 
@@ -1269,12 +1386,12 @@ export default function DashboardPage() {
                   )}
                 </AnimatePresence>
               </div>
-            </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* --- SELECTED TRIP ITINERARY MODAL --- */}
+      {/* --- ITINERARY MODAL --- */}
       {selectedTrip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <motion.div 
@@ -1324,6 +1441,127 @@ export default function DashboardPage() {
           </motion.div>
         </div>
       )}
+
+      {/* --- DYNAMIC VISIT LOG DETAILS FORM MODAL --- */}
+      {activeVisitLoggingSlug && (() => {
+        const destDetails = destinations.find(d => d.slug === activeVisitLoggingSlug);
+        if (!destDetails) return null;
+        
+        // Find existing log values if any to prefill
+        const existingLog = visitedLogs.find(l => l.slug === activeVisitLoggingSlug);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-full max-w-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+            >
+              <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-blue-600">Travel Log Book</span>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">Log Trip: {destDetails.name}</h3>
+                </div>
+                <button 
+                  onClick={() => setActiveVisitLoggingSlug(null)}
+                  className="p-1.5 text-gray-400 hover:text-gray-650 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const target = e.target as any;
+                  addVisitedLog(
+                    activeVisitLoggingSlug,
+                    parseInt(target.rating.value),
+                    parseFloat(target.expense.value) || 0,
+                    target.visitedHighlights.value,
+                    target.foodName.value,
+                    parseInt(target.foodRating.value),
+                    target.weather.value,
+                    target.experience.value
+                  );
+                  setActiveVisitLoggingSlug(null);
+                }}
+                className="p-6 overflow-y-auto space-y-4"
+              >
+                {/* Rating & Expense */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Destination Rating</label>
+                    <select name="rating" defaultValue={existingLog?.rating || "5"} className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none">
+                      <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                      <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                      <option value="3">⭐⭐⭐ (3/5)</option>
+                      <option value="2">⭐⭐ (2/5)</option>
+                      <option value="1">⭐ (1/5)</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Visit Expense (₹)</label>
+                    <input type="number" required name="expense" defaultValue={existingLog?.expense || ""} placeholder="e.g. 5000" className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                  </div>
+                </div>
+
+                {/* Weather & Highlights */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Weather Condition</label>
+                    <select name="weather" defaultValue={existingLog?.weather || "Pleasant"} className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none">
+                      <option value="Sunny">Sunny ☀️</option>
+                      <option value="Pleasant">Pleasant 🌤️</option>
+                      <option value="Cold">Cold ❄️</option>
+                      <option value="Rainy">Rainy 🌧️</option>
+                      <option value="Hot">Hot 🌡️</option>
+                      <option value="Snowing">Snowing 🌨️</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">What & Where Visited</label>
+                    <input type="text" name="visitedHighlights" required defaultValue={existingLog?.visitedHighlights || ""} placeholder="e.g. golden temple, local museum, lake" className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                  </div>
+                </div>
+
+                {/* Food Details */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Local Food Tried</label>
+                    <input type="text" name="foodName" required defaultValue={existingLog?.foodName || ""} placeholder="e.g. butter chicken, local fish fry" className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Food Rating</label>
+                    <select name="foodRating" defaultValue={existingLog?.foodRating || "5"} className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none">
+                      <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                      <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                      <option value="3">⭐⭐⭐ (3/5)</option>
+                      <option value="2">⭐⭐ (2/5)</option>
+                      <option value="1">⭐ (1/5)</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Overall experience */}
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500">Describe Your Experience</label>
+                  <textarea name="experience" required rows={3} defaultValue={existingLog?.experience || ""} placeholder="Tell us how the trip was, tips for fellow travelers..." className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-gray-150 dark:border-gray-800 justify-end">
+                  <button type="submit" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold shadow-sm">
+                    Save Journey Log
+                  </button>
+                  <button type="button" onClick={() => setActiveVisitLoggingSlug(null)} className="px-5 py-2.5 bg-gray-150 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-semibold">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        );
+      })()}
     </main>
   );
 }
