@@ -100,7 +100,7 @@ export default function Navbar() {
                         <div className="hidden sm:flex items-center gap-2">
                           {!user && (
                             <Link
-                              to="/dashboard?prefill=somendra"
+                              to="/dashboard?admin=true"
                               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
                             >
                               <Shield className="w-3.5 h-3.5 text-blue-500" />
@@ -154,7 +154,7 @@ export default function Navbar() {
                             ))}
                             {!user && (
                                 <Link
-                                    to="/dashboard?prefill=somendra"
+                                    to="/dashboard?admin=true"
                                     className="flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium"
                                 >
                                     <Shield className="w-5 h-5 text-blue-500" />

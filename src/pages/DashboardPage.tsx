@@ -80,12 +80,10 @@ export default function DashboardPage() {
   const [blogCoverImage, setBlogCoverImage] = useState('');
   const [blogContent, setBlogContent] = useState('');
 
-  // Prefill credentials if routing from Admin Login navbar action
+  // Handle transition from Admin Login navbar action
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('prefill') === 'somendra') {
-      setUsername('somendra');
-      setPassword('Somendra@2007');
+    if (params.get('admin') === 'true') {
       setIsLoginTab(true);
     }
   }, []);
