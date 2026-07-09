@@ -9,7 +9,13 @@ export const getSalt = query({
       .query("users")
       .withIndex("by_username", (q: any) => q.eq("username", args.username))
       .unique();
-    return user ? user.salt : null;
+    if (user) return user.salt;
+    
+    // Default salt for admin auto-registration
+    if (args.username.toLowerCase().trim() === "somendra") {
+      return "adminsalt";
+    }
+    return null;
   },
 });
 
@@ -64,12 +70,27 @@ export const login = mutation({
     passwordHash: v.string(),
   },
   handler: async (ctx: any, args: any) => {
-    const user = await ctx.db
+    const normalizedUsername = args.username.toLowerCase().trim();
+    let user = await ctx.db
       .query("users")
-      .withIndex("by_username", (q: any) => q.eq("username", args.username))
+      .withIndex("by_username", (q: any) => q.eq("username", normalizedUsername))
       .unique();
 
-    if (!user || user.passwordHash !== args.passwordHash) {
+    if (!user) {
+      // Securely auto-seed admin if login hash matches Somendra@2007 + adminsalt
+      if (normalizedUsername === "somendra" && args.passwordHash === "51d8d7aabfe1e07d3840434661fd8f81016e543ada7054cae8ba3d7f0095198c") {
+        const userId = await ctx.db.insert("users", {
+          username: "somendra",
+          passwordHash: "51d8d7aabfe1e07d3840434661fd8f81016e543ada7054cae8ba3d7f0095198c",
+          salt: "adminsalt",
+          name: "Somendra",
+          phone: "9999999999",
+        });
+        user = await ctx.db.get(userId);
+      } else {
+        throw new Error("Invalid username or password");
+      }
+    } else if (user.passwordHash !== args.passwordHash) {
       throw new Error("Invalid username or password");
     }
 

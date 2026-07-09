@@ -518,7 +518,9 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="relative z-10 space-y-2">
-                    <span className="text-[10px] uppercase tracking-widest font-extrabold text-blue-200">Welcome Back Traveler,</span>
+                    <span className="text-[10px] uppercase tracking-widest font-extrabold text-blue-200">
+                      {user.username === 'somendra' ? 'Welcome Admin' : 'Welcome Back Traveler,'}
+                    </span>
                     <h2 className="text-3xl md:text-4xl font-black">{user.name}</h2>
                     <p className="text-xs text-blue-100 font-semibold flex items-center gap-2">
                       <span>@{user.username}</span>

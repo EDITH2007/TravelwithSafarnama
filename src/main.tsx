@@ -9,7 +9,7 @@ import { AuthProvider } from './context/AuthContext'
 import App from './App'
 import './styles/index.css'
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || 'https://dummy-url.convex.cloud')
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || 'https://coordinated-alligator-228.convex.cloud')
 
 const queryClient = new QueryClient({
   defaultOptions: {

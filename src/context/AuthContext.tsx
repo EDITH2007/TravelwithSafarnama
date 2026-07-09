@@ -377,7 +377,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [discoveredDestinations, setDiscoveredDestinations] = useState<DiscoveredDestination[]>([]);
 
   // Determine if we should run in Mock Mode
-  const convexUrl = import.meta.env.VITE_CONVEX_URL || '';
+  const convexUrl = import.meta.env.VITE_CONVEX_URL || 'https://coordinated-alligator-228.convex.cloud';
   const isMock = !convexUrl || convexUrl.includes('dummy-url') || convexUrl.includes('placeholder');
 
   // Load Shared Global Data from localStorage or defaults
