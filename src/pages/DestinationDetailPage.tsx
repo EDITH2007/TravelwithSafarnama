@@ -2,10 +2,14 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { MapPin, Star, Calendar, DollarSign, Thermometer, Heart, Share2, ChevronLeft, Utensils, Hotel, Camera } from 'lucide-react'
 import { getDestinationBySlug } from '../data/destinations'
+import { useAuth } from '../context/AuthContext'
 
 export default function DestinationDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const destination = getDestinationBySlug(slug || '')
+  const { isDestinationSaved, toggleSaveDestination, isPlaceVisited, toggleVisitedPlace } = useAuth()
+  const isSaved = destination ? isDestinationSaved(destination.slug) : false
+  const isVisited = destination ? isPlaceVisited(destination.slug) : false
 
   if (!destination) {
     return (
@@ -60,8 +64,19 @@ export default function DestinationDetailPage() {
                 <span className="text-white/60">({destination.reviewCount} reviews)</span>
               </div>
               <div className="flex gap-2">
-                <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40">
-                  <Heart className="w-5 h-5 text-white" />
+                <button 
+                  onClick={() => destination && toggleSaveDestination(destination.slug)}
+                  className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40 transition-colors"
+                  title={isSaved ? "Remove from Wishlist" : "Add to Wishlist"}
+                >
+                  <Heart className={`w-5 h-5 transition-colors ${isSaved ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+                </button>
+                <button 
+                  onClick={() => destination && toggleVisitedPlace(destination.slug)}
+                  className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40 transition-colors"
+                  title={isVisited ? "Mark as Unvisited" : "Mark as Visited"}
+                >
+                  <MapPin className={`w-5 h-5 transition-colors ${isVisited ? 'fill-blue-500 text-blue-500' : 'text-white'}`} />
                 </button>
                 <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/40">
                   <Share2 className="w-5 h-5 text-white" />

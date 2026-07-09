@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Search, MapPin, Clock, Users, Star, Navigation } from 'lucide-react'
 import { experiences } from '../data/experiences'
+import { useAuth } from '../context/AuthContext'
 
 const categories = [
   { id: 'all', name: 'All Experiences', icon: '🎯' },
@@ -16,6 +17,7 @@ const categories = [
 export default function ExperiencesPage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const { experiences: communityStories } = useAuth()
 
   const filtered = experiences.filter(e => {
     const matchesCategory = selectedCategory === 'all' || e.category === selectedCategory
@@ -222,6 +224,54 @@ export default function ExperiencesPage() {
               <p className="text-gray-500">
                 Try searching with different keywords or browse all categories.
               </p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Community Traveler Stories Section */}
+      <section className="section-padding py-16 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="heading-lg text-gray-900 dark:text-white">Community Traveler Stories</h2>
+            <p className="text-gray-500 mt-2 max-w-xl mx-auto text-sm">
+              Real diaries and reviews shared by our community travelers.
+            </p>
+          </div>
+
+          {communityStories.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {communityStories.map((story) => (
+                <div key={story.id} className="bg-slate-50 dark:bg-gray-950 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-6 shadow-sm flex flex-col justify-between space-y-4">
+                  <div>
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-1 text-orange-500">
+                        {[...Array(story.rating)].map((_, i) => (
+                          <Star key={i} className="w-3.5 h-3.5 fill-orange-500" />
+                        ))}
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase bg-gray-200/50 dark:bg-gray-800 px-2.5 py-0.5 rounded-full">
+                        Score: {story.score}
+                      </span>
+                    </div>
+                    <p className="text-gray-700 dark:text-gray-300 text-sm mt-3 leading-relaxed italic">
+                      "{story.text}"
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-250/20 dark:border-gray-850 flex items-center gap-3">
+                    <img src={story.avatar} alt={story.name} className="w-10 h-10 rounded-full object-cover border" />
+                    <div>
+                      <h4 className="font-bold text-gray-900 dark:text-white text-xs">{story.name}</h4>
+                      <p className="text-[10px] text-gray-500">{story.location} • Visited {story.destination}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              No community stories submitted yet. Submit yours from the User Dashboard!
             </div>
           )}
         </div>

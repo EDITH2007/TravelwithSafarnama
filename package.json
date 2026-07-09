@@ -13,6 +13,7 @@
     "@hookform/resolvers": "^5.4.0",
     "@tanstack/react-query": "^5.100.14",
     "clsx": "^2.1.1",
+    "convex": "^1.42.1",
     "date-fns": "^4.3.0",
     "framer-motion": "^12.40.0",
     "lucide-react": "^1.16.0",

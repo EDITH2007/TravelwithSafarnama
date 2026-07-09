@@ -1,33 +1,27 @@
-import { Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ChevronLeft, Calendar, Clock, Heart, Share2 } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 
 export default function BlogDetailPage() {
-  // Mock blog data - in real app, fetch by slug
-  const blog = {
-    title: '10 Hidden Gems in Himachal Pradesh You Must Visit',
-    content: `
-      <p>Himachal Pradesh is known for its popular tourist destinations like Manali and Shimla, but there's so much more to explore beyond the beaten path. Here are 10 hidden gems that will take your breath away:</p>
-      
-      <h2>1. Tirthan Valley</h2>
-      <p>A pristine valley located in the Kullu district, Tirthan is perfect for trout fishing and riverside camping. The Great Himalayan National Park is nearby.</p>
-      
-      <h2>2. Barot Valley</h2>
-      <p>A relatively unexplored destination in Mandi district, known for its Uhl river and lush green landscapes. Perfect for nature lovers.</p>
-      
-      <h2>3. Pabbar Valley</h2>
-      <p>Located in Shimla district, this valley offers trekking, camping, and stunning views of the Himalayan ranges.</p>
-    `,
-    coverImage: 'https://images.unsplash.com/photo-1626010448982-4d629b9d2386?w=1200',
-    author: {
-      name: 'Rahul Sharma',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
-      bio: 'Travel writer and photographer exploring India since 2015.',
-    },
-    category: 'Hidden Places',
-    readTime: 8,
-    createdAt: '2024-01-15',
-    likes: 234,
+  const { slug } = useParams<{ slug: string }>()
+  const { blogs } = useAuth()
+  
+  const blog = blogs.find(b => b.slug === slug)
+
+  if (!blog) {
+    return (
+      <main className="pt-20 min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Blog Post Not Found
+          </h1>
+          <Link to="/blogs" className="text-blue-600 hover:underline">
+            Back to travel blogs
+          </Link>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -50,14 +44,14 @@ export default function BlogDetailPage() {
           >
             <Link
               to="/blogs"
-              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 mb-6"
+              className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 mb-6 font-semibold"
             >
               <ChevronLeft className="w-4 h-4" />
               Back to blogs
             </Link>
 
             <span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 
-                          rounded-full text-sm font-medium mb-4">
+                          rounded-full text-sm font-medium mb-4 uppercase">
               {blog.category}
             </span>
 
@@ -74,7 +68,7 @@ export default function BlogDetailPage() {
                 />
                 <div>
                   <div className="font-semibold text-gray-900 dark:text-white">{blog.author.name}</div>
-                  <div className="text-sm text-gray-500">{blog.author.bio}</div>
+                  <div className="text-xs text-gray-500">Traveler Community Member</div>
                 </div>
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -92,8 +86,8 @@ export default function BlogDetailPage() {
             <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-200 dark:border-gray-800">
               <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 
                                hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                <Heart className="w-4 h-4" />
-                <span>{blog.likes}</span>
+                <Heart className="w-4 h-4 text-red-500" />
+                <span>Likes</span>
               </button>
               <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 
                                hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
@@ -103,7 +97,7 @@ export default function BlogDetailPage() {
             </div>
 
             <div 
-              className="prose prose-lg dark:prose-invert max-w-none"
+              className="prose prose-lg dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
           </motion.div>

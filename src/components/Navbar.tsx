@@ -3,13 +3,13 @@ import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Sun, Moon, User } from 'lucide-react'
 import { useThemeStore } from '../stores/themeStore'
+import { useAuth } from '../context/AuthContext'
 
 // AFTER:
 const navLinks = [
   { name: 'Home', path: '/' },
   { name: 'Destinations', path: '/destinations' },
   { name: 'Journeys', path: '/journeys' },
-  { name: 'Road Trips', path: '/road-trips' },
   { name: 'Gallery', path: '/gallery' },
   { name: 'Blogs', path: '/blogs' },
   { name: 'Trip Planner', path: '/trip-planner' },
@@ -19,6 +19,7 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const { theme, toggleTheme } = useThemeStore()
+    const { user } = useAuth()
     const location = useLocation()
 
     useEffect(() => {
@@ -102,7 +103,7 @@ export default function Navbar() {
                        text-white text-sm font-medium hover:bg-blue-700 transition-colors"
                         >
                             <User className="w-4 h-4" />
-                            <span>Dashboard</span>
+                            <span>{user ? `Hi, ${user.name.split(' ')[0]}` : 'Sign In'}</span>
                         </Link>
 
                         {/* Mobile Menu Button */}
@@ -146,7 +147,7 @@ export default function Navbar() {
                          text-white font-medium"
                             >
                                 <User className="w-5 h-5" />
-                                Dashboard
+                                {user ? `Hi, ${user.name.split(' ')[0]}` : 'Sign In'}
                             </Link>
                         </div>
                     </motion.div>

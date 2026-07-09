@@ -4,6 +4,8 @@ import { MapPin, Calendar, Users, DollarSign, Sparkles } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { planTrip } from '../services/puter'
 import type { TripPlan, TripPlanDay } from '../services/puter'
+import { useAuth } from '../context/AuthContext'
+import { Bookmark } from 'lucide-react'
 
 const initialPlanData = {
   destination: '',
@@ -18,6 +20,7 @@ export default function TripPlannerPage() {
   const [tripData, setTripData] = useState(initialPlanData)
   const [plan, setPlan] = useState<TripPlan | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const { user, saveTripPlan } = useAuth()
 
   const handleNext = async () => {
     if (step === 1 && !tripData.destination) {
@@ -289,12 +292,30 @@ export default function TripPlannerPage() {
               )}
 
               {step === 4 ? (
-                <button
-                  onClick={handleReset}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors ml-auto"
-                >
-                  Plan Again
-                </button>
+                <div className="flex gap-4 ml-auto">
+                  {user && (
+                    <button
+                      onClick={() => plan && saveTripPlan({
+                        destination: plan.destination,
+                        startDate: tripData.startDate,
+                        endDate: tripData.endDate,
+                        travelers: tripData.travelers,
+                        budget: tripData.budget,
+                        summary: plan.summary,
+                      })}
+                      className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-colors"
+                    >
+                      <Bookmark className="w-4 h-4" />
+                      Save to Dashboard
+                    </button>
+                  )}
+                  <button
+                    onClick={handleReset}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Plan Again
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={handleNext}

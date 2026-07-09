@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { MapPin, Star, Heart, ArrowUpRight } from 'lucide-react'
 import type { Destination } from '../types'
+import { useAuth } from '../context/AuthContext'
 
 interface Props {
   destination: Destination
@@ -9,6 +10,9 @@ interface Props {
 }
 
 export default function DestinationCard({ destination, index = 0 }: Props) {
+  const { isDestinationSaved, toggleSaveDestination, isPlaceVisited, toggleVisitedPlace } = useAuth()
+  const isSaved = isDestinationSaved(destination.slug)
+  const isVisited = isPlaceVisited(destination.slug)
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -42,17 +46,34 @@ export default function DestinationCard({ destination, index = 0 }: Props) {
               )}
             </div>
 
-            {/* Favorite Button */}
-            <button
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-              }}
-              className="absolute top-4 right-4 p-2 rounded-full bg-white/20 backdrop-blur-sm 
-                       hover:bg-white/40 transition-colors"
-            >
-              <Heart className="w-4 h-4 text-white" />
-            </button>
+            {/* Favorite & Visited Buttons */}
+            <div className="absolute top-4 right-4 flex gap-2 z-10">
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggleVisitedPlace(destination.slug)
+                }}
+                className="p-2 rounded-full bg-white/20 backdrop-blur-sm 
+                         hover:bg-white/40 transition-colors"
+                title={isVisited ? "Mark as Unvisited" : "Mark as Visited"}
+              >
+                <MapPin className={`w-4 h-4 transition-colors ${isVisited ? 'fill-blue-500 text-blue-500' : 'text-white'}`} />
+              </button>
+
+              <button
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  toggleSaveDestination(destination.slug)
+                }}
+                className="p-2 rounded-full bg-white/20 backdrop-blur-sm 
+                         hover:bg-white/40 transition-colors"
+                title={isSaved ? "Remove from Wishlist" : "Add to Wishlist"}
+              >
+                <Heart className={`w-4 h-4 transition-colors ${isSaved ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+              </button>
+            </div>
 
             {/* Info Overlay */}
             <div className="absolute bottom-4 left-4 right-4">
