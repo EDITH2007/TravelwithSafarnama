@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useConvex } from 'convex/react';
+import { useConvex, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import toast from 'react-hot-toast';
 
@@ -354,8 +354,27 @@ async function calculateImageAestheticScore(src: string): Promise<number> {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(localStorage.getItem('safarnama-auth-token'));
   const [isLoading, setIsLoading] = useState(true);
   const convex = useConvex();
+
+  // Determine if we should run in Mock Mode
+  const convexUrl = import.meta.env.VITE_CONVEX_URL || 'https://coordinated-alligator-228.convex.cloud';
+  const isMock = !convexUrl || convexUrl.includes('dummy-url') || convexUrl.includes('placeholder');
+
+  // Real-time backend subscriptions (only active when not in Mock Mode)
+  const rawBlogs = useQuery(api.content.listBlogs, isMock ? "skip" : undefined);
+  const rawExperiences = useQuery(api.content.listExperiences, isMock ? "skip" : undefined);
+  const rawPhotos = useQuery(api.content.listPhotos, isMock ? "skip" : undefined);
+  const rawDiscoveries = useQuery(api.content.listDiscoveries, isMock ? "skip" : undefined);
+
+  // User Dashboard queries (skip if not logged in or in mock mode)
+  const skipDash = isMock || !token || !user;
+  const rawWishlist = useQuery(api.dashboard.listWishlist, skipDash ? "skip" : { token: token || "" });
+  const rawVisited = useQuery(api.dashboard.listVisited, skipDash ? "skip" : { token: token || "" });
+  const rawVisitedLogs = useQuery(api.dashboard.listVisitedLogs, skipDash ? "skip" : { token: token || "" });
+  const rawTripPlans = useQuery(api.dashboard.listTripPlans, skipDash ? "skip" : { token: token || "" });
+  const rawExpenses = useQuery(api.dashboard.listExpenses, skipDash ? "skip" : { token: token || "" });
 
   // User features states
   const [savedDestinations, setSavedDestinations] = useState<string[]>([]);
@@ -376,24 +395,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [landingPageStories, setLandingPageStories] = useState<any[]>([]);
   const [discoveredDestinations, setDiscoveredDestinations] = useState<DiscoveredDestination[]>([]);
 
-  // Determine if we should run in Mock Mode
-  const convexUrl = import.meta.env.VITE_CONVEX_URL || 'https://coordinated-alligator-228.convex.cloud';
-  const isMock = !convexUrl || convexUrl.includes('dummy-url') || convexUrl.includes('placeholder');
-
-  // Load Shared Global Data from localStorage or defaults
+  // Load Shared Global Data from localStorage or defaults (Active in Mock Mode)
   useEffect(() => {
-    const savedBlogs = localStorage.getItem('safarnama-global-blogs');
-    setBlogs(savedBlogs ? JSON.parse(savedBlogs) : defaultBlogs);
+    if (isMock) {
+      const savedBlogs = localStorage.getItem('safarnama-global-blogs');
+      setBlogs(savedBlogs ? JSON.parse(savedBlogs) : defaultBlogs);
 
-    const savedPhotos = localStorage.getItem('safarnama-global-all-photos');
-    setAllPhotos(savedPhotos ? JSON.parse(savedPhotos) : []); 
+      const savedPhotos = localStorage.getItem('safarnama-global-all-photos');
+      setAllPhotos(savedPhotos ? JSON.parse(savedPhotos) : []); 
 
-    const savedExperiences = localStorage.getItem('safarnama-global-experiences');
-    setExperiences(savedExperiences ? JSON.parse(savedExperiences) : defaultTestimonials);
+      const savedExperiences = localStorage.getItem('safarnama-global-experiences');
+      setExperiences(savedExperiences ? JSON.parse(savedExperiences) : defaultTestimonials);
 
-    const savedDiscoveries = localStorage.getItem('safarnama-global-discoveries');
-    setDiscoveredDestinations(savedDiscoveries ? JSON.parse(savedDiscoveries) : []);
-  }, []);
+      const savedDiscoveries = localStorage.getItem('safarnama-global-discoveries');
+      setDiscoveredDestinations(savedDiscoveries ? JSON.parse(savedDiscoveries) : []);
+    }
+  }, [isMock]);
+
+  // Synchronize Convex live database queries to global states when not in Mock Mode
+  useEffect(() => {
+    if (!isMock && rawBlogs) {
+      const mappedBlogs = rawBlogs.map((b: any) => ({
+        ...b,
+        id: b._id,
+        author: {
+          name: b.authorName,
+          avatar: b.authorAvatar,
+        }
+      }));
+      setBlogs(mappedBlogs);
+    }
+  }, [rawBlogs, isMock]);
+
+  useEffect(() => {
+    if (!isMock && rawExperiences) {
+      const mappedExperiences = rawExperiences.map((e: any) => ({
+        ...e,
+        id: e._id,
+      }));
+      setExperiences(mappedExperiences);
+    }
+  }, [rawExperiences, isMock]);
+
+  useEffect(() => {
+    if (!isMock && rawPhotos) {
+      const mappedPhotos = rawPhotos.map((p: any) => ({
+        ...p,
+        id: p._id,
+      }));
+      setAllPhotos(mappedPhotos);
+    }
+  }, [rawPhotos, isMock]);
+
+  useEffect(() => {
+    if (!isMock && rawDiscoveries) {
+      const mappedDiscoveries = rawDiscoveries.map((d: any) => ({
+        ...d,
+        id: d._id,
+      }));
+      setDiscoveredDestinations(mappedDiscoveries);
+    }
+  }, [rawDiscoveries, isMock]);
 
   // Compute Landing Page Stories and Gallery display pictures when variables change
   useEffect(() => {
@@ -456,18 +518,76 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setExpenses(exp ? JSON.parse(exp) : []);
   };
 
-  // Sync user data to localStorage
+  // Sync user data to localStorage (Mock Mode)
   useEffect(() => {
-    if (user) {
-      loadUserData(user._id);
-    } else {
-      setSavedDestinations([]);
-      setTripPlans([]);
-      setVisitedPlaces([]);
-      setVisitedLogs([]);
-      setExpenses([]);
+    if (isMock) {
+      if (user) {
+        loadUserData(user._id);
+      } else {
+        setSavedDestinations([]);
+        setTripPlans([]);
+        setVisitedPlaces([]);
+        setVisitedLogs([]);
+        setExpenses([]);
+      }
     }
-  }, [user]);
+  }, [user, isMock]);
+
+  // Synchronize Convex queries for user data (Live Mode)
+  useEffect(() => {
+    if (!isMock && rawWishlist) {
+      setSavedDestinations(rawWishlist.map((w: any) => w.slug));
+    }
+  }, [rawWishlist, isMock]);
+
+  useEffect(() => {
+    if (!isMock && rawVisited) {
+      setVisitedPlaces(rawVisited.map((v: any) => v.slug));
+    }
+  }, [rawVisited, isMock]);
+
+  useEffect(() => {
+    if (!isMock && rawVisitedLogs) {
+      const mapped = rawVisitedLogs.map((l: any) => ({
+        slug: l.slug,
+        rating: l.rating,
+        expense: l.expense,
+        visitedHighlights: l.visitedHighlights,
+        foodName: l.foodName,
+        foodRating: l.foodRating,
+        currentWeather: l.currentWeather,
+        experience: l.experience,
+      }));
+      setVisitedLogs(mapped);
+    }
+  }, [rawVisitedLogs, isMock]);
+
+  useEffect(() => {
+    if (!isMock && rawTripPlans) {
+      const mapped = rawTripPlans.map((t: any) => ({
+        id: t._id,
+        destination: t.destination,
+        startDate: t.startDate,
+        endDate: t.endDate,
+        travelers: t.travelers,
+        summary: t.summary,
+      }));
+      setTripPlans(mapped);
+    }
+  }, [rawTripPlans, isMock]);
+
+  useEffect(() => {
+    if (!isMock && rawExpenses) {
+      const mapped = rawExpenses.map((e: any) => ({
+        id: e._id,
+        amount: e.amount,
+        category: e.category,
+        description: e.description,
+        date: e.date,
+      }));
+      setExpenses(mapped);
+    }
+  }, [rawExpenses, isMock]);
 
   // Try to load user session on mount
   useEffect(() => {
@@ -512,41 +632,85 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Saved Destinations Helpers
   const isDestinationSaved = (slug: string) => savedDestinations.includes(slug);
 
-  const toggleSaveDestination = (slug: string) => {
+  const toggleSaveDestination = async (slug: string) => {
     if (!user) {
       toast.error('Please sign in to save destinations');
       return;
     }
-    const updated = savedDestinations.includes(slug)
-      ? savedDestinations.filter((s) => s !== slug)
-      : [...savedDestinations, slug];
-    setSavedDestinations(updated);
-    localStorage.setItem(`safarnama-saved-${user._id}`, JSON.stringify(updated));
-    if (savedDestinations.includes(slug)) {
-      toast.success('Destination removed from wishlist');
+
+    if (isMock) {
+      const updated = savedDestinations.includes(slug)
+        ? savedDestinations.filter((s) => s !== slug)
+        : [...savedDestinations, slug];
+      setSavedDestinations(updated);
+      localStorage.setItem(`safarnama-saved-${user._id}`, JSON.stringify(updated));
+      if (savedDestinations.includes(slug)) {
+        toast.success('Destination removed from wishlist');
+      } else {
+        toast.success('Destination saved to wishlist! ❤️');
+      }
     } else {
-      toast.success('Destination saved to wishlist! ❤️');
+      const wishlistToast = toast.loading('Updating wishlist...');
+      try {
+        const result = await convex.mutation(api.dashboard.toggleWishlist, { token: token || "", slug });
+        if (result.action === 'removed') {
+          toast.success('Destination removed from wishlist', { id: wishlistToast });
+        } else {
+          toast.success('Destination saved to wishlist! ❤️', { id: wishlistToast });
+        }
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to update wishlist.', { id: wishlistToast });
+      }
     }
   };
 
   // Trip Plans Helpers
-  const saveTripPlan = (plan: any) => {
+  const saveTripPlan = async (plan: any) => {
     if (!user) {
       toast.error('Please sign in to save trip plans');
       return;
     }
-    const updated = [...tripPlans, { ...plan, id: `trip-${Date.now()}`, creationTime: Date.now() }];
-    setTripPlans(updated);
-    localStorage.setItem(`safarnama-trips-${user._id}`, JSON.stringify(updated));
-    toast.success('Trip plan saved successfully! ✈️');
+
+    if (isMock) {
+      const updated = [...tripPlans, { ...plan, id: `trip-${Date.now()}`, creationTime: Date.now() }];
+      setTripPlans(updated);
+      localStorage.setItem(`safarnama-trips-${user._id}`, JSON.stringify(updated));
+      toast.success('Trip plan saved successfully! ✈️');
+    } else {
+      const planToast = toast.loading('Saving plan to cloud...');
+      try {
+        await convex.mutation(api.dashboard.createTripPlan, {
+          token: token || "",
+          destination: plan.destination,
+          startDate: plan.startDate,
+          endDate: plan.endDate,
+          travelers: plan.travelers,
+          summary: plan.summary,
+        });
+        toast.success('Trip plan saved successfully! ✈️', { id: planToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to save trip plan.', { id: planToast });
+      }
+    }
   };
 
-  const deleteTripPlan = (planId: string) => {
+  const deleteTripPlan = async (planId: string) => {
     if (!user) return;
-    const updated = tripPlans.filter((t) => t.id !== planId);
-    setTripPlans(updated);
-    localStorage.setItem(`safarnama-trips-${user._id}`, JSON.stringify(updated));
-    toast.success('Trip plan deleted');
+
+    if (isMock) {
+      const updated = tripPlans.filter((t) => t.id !== planId);
+      setTripPlans(updated);
+      localStorage.setItem(`safarnama-trips-${user._id}`, JSON.stringify(updated));
+      toast.success('Trip plan deleted');
+    } else {
+      const planToast = toast.loading('Removing plan...');
+      try {
+        await convex.mutation(api.dashboard.deleteTripPlan, { token: token || "", id: planId as any });
+        toast.success('Trip plan deleted', { id: planToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to delete plan.', { id: planToast });
+      }
+    }
   };
 
   // Visited Places & Detailed Visited Logs
@@ -568,7 +732,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const addVisitedLog = (
+  const addVisitedLog = async (
     slug: string, 
     rating: number, 
     expense: number, 
@@ -580,104 +744,202 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   ) => {
     if (!user) return;
 
-    // 1. Add to visitedPlaces if not already present
-    let updatedPlaces = [...visitedPlaces];
-    if (!visitedPlaces.includes(slug)) {
-      updatedPlaces.push(slug);
-      setVisitedPlaces(updatedPlaces);
-      localStorage.setItem(`safarnama-visited-${user._id}`, JSON.stringify(updatedPlaces));
-    }
+    if (isMock) {
+      // 1. Add to visitedPlaces if not already present
+      let updatedPlaces = [...visitedPlaces];
+      if (!visitedPlaces.includes(slug)) {
+        updatedPlaces.push(slug);
+        setVisitedPlaces(updatedPlaces);
+        localStorage.setItem(`safarnama-visited-${user._id}`, JSON.stringify(updatedPlaces));
+      }
 
-    // 2. Add or update the visited log item
-    const newLog: VisitedLog = {
-      slug,
-      rating,
-      expense,
-      visitedHighlights,
-      foodName,
-      foodRating,
-      weather,
-      experience,
-      date: Date.now()
-    };
+      // 2. Add or update the visited log item
+      const newLog: VisitedLog = {
+        slug,
+        rating,
+        expense,
+        visitedHighlights,
+        foodName,
+        foodRating,
+        weather,
+        experience,
+        date: Date.now()
+      };
 
-    const existingIndex = visitedLogs.findIndex((log) => log.slug === slug);
-    let updatedLogs = [...visitedLogs];
-    if (existingIndex > -1) {
-      updatedLogs[existingIndex] = newLog;
+      const existingIndex = visitedLogs.findIndex((log) => log.slug === slug);
+      let updatedLogs = [...visitedLogs];
+      if (existingIndex > -1) {
+        updatedLogs[existingIndex] = newLog;
+      } else {
+        updatedLogs.push(newLog);
+      }
+      setVisitedLogs(updatedLogs);
+      localStorage.setItem(`safarnama-visitedlogs-${user._id}`, JSON.stringify(updatedLogs));
+
+      // 3. Remove from wishlist/saved destinations automatically if it is there!
+      if (savedDestinations.includes(slug)) {
+        const updatedSaved = savedDestinations.filter((s) => s !== slug);
+        setSavedDestinations(updatedSaved);
+        localStorage.setItem(`safarnama-saved-${user._id}`, JSON.stringify(updatedSaved));
+      }
+
+      toast.success('Visited place details logged! Wishlist updated. 📍');
     } else {
-      updatedLogs.push(newLog);
-    }
-    setVisitedLogs(updatedLogs);
-    localStorage.setItem(`safarnama-visitedlogs-${user._id}`, JSON.stringify(updatedLogs));
+      const logToast = toast.loading('Logging visit to cloud...');
+      try {
+        // 1. Add to visitedPlaces if not already present
+        if (!visitedPlaces.includes(slug)) {
+          await convex.mutation(api.dashboard.toggleVisited, { token: token || "", slug });
+        }
 
-    // 3. Remove from wishlist/saved destinations automatically if it is there!
-    if (savedDestinations.includes(slug)) {
-      const updatedSaved = savedDestinations.filter((s) => s !== slug);
-      setSavedDestinations(updatedSaved);
-      localStorage.setItem(`safarnama-saved-${user._id}`, JSON.stringify(updatedSaved));
-    }
+        // 2. Add or update log
+        await convex.mutation(api.dashboard.addVisitedLog, {
+          token: token || "",
+          slug,
+          rating,
+          expense,
+          visitedHighlights,
+          foodName,
+          foodRating,
+          currentWeather: weather,
+          experience,
+        });
 
-    toast.success('Visited place details logged! Wishlist updated. 📍');
+        // 3. Auto-remove from wishlist if present
+        if (savedDestinations.includes(slug)) {
+          await convex.mutation(api.dashboard.toggleWishlist, { token: token || "", slug });
+        }
+
+        toast.success('Visited place details logged! Wishlist updated. 📍', { id: logToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to log visit.', { id: logToast });
+      }
+    }
   };
 
-  const removeVisitedLog = (slug: string) => {
+  const removeVisitedLog = async (slug: string) => {
     if (!user) return;
-    const updatedPlaces = visitedPlaces.filter((s) => s !== slug);
-    setVisitedPlaces(updatedPlaces);
-    localStorage.setItem(`safarnama-visited-${user._id}`, JSON.stringify(updatedPlaces));
 
-    const updatedLogs = visitedLogs.filter((l) => l.slug !== slug);
-    setVisitedLogs(updatedLogs);
-    localStorage.setItem(`safarnama-visitedlogs-${user._id}`, JSON.stringify(updatedLogs));
+    if (isMock) {
+      const updatedPlaces = visitedPlaces.filter((s) => s !== slug);
+      setVisitedPlaces(updatedPlaces);
+      localStorage.setItem(`safarnama-visited-${user._id}`, JSON.stringify(updatedPlaces));
 
-    toast.success('Trip visit removed');
+      const updatedLogs = visitedLogs.filter((l) => l.slug !== slug);
+      setVisitedLogs(updatedLogs);
+      localStorage.setItem(`safarnama-visitedlogs-${user._id}`, JSON.stringify(updatedLogs));
+
+      toast.success('Trip visit removed');
+    } else {
+      const removeToast = toast.loading('Removing visit log...');
+      try {
+        await convex.mutation(api.dashboard.removeVisitedLog, { token: token || "", slug });
+        await convex.mutation(api.dashboard.toggleVisited, { token: token || "", slug });
+        toast.success('Trip visit removed', { id: removeToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to remove visit.', { id: removeToast });
+      }
+    }
   };
 
   // Expenses Helpers
-  const addExpense = (amount: number, category: string, description: string) => {
+  const addExpense = async (amount: number, category: string, description: string) => {
     if (!user) return;
-    const updated = [
-      ...expenses,
-      { id: `exp-${Date.now()}`, amount, category, description, date: Date.now() },
-    ];
-    setExpenses(updated);
-    localStorage.setItem(`safarnama-expenses-${user._id}`, JSON.stringify(updated));
-    toast.success('Expense logged successfully! 💰');
+
+    if (isMock) {
+      const updated = [
+        ...expenses,
+        { id: `exp-${Date.now()}`, amount, category, description, date: Date.now() },
+      ];
+      setExpenses(updated);
+      localStorage.setItem(`safarnama-expenses-${user._id}`, JSON.stringify(updated));
+      toast.success('Expense logged successfully! 💰');
+    } else {
+      const expToast = toast.loading('Saving expense to cloud...');
+      try {
+        await convex.mutation(api.dashboard.createExpense, {
+          token: token || "",
+          amount,
+          category,
+          description,
+          date: Date.now(),
+        });
+        toast.success('Expense logged successfully! 💰', { id: expToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to save expense.', { id: expToast });
+      }
+    }
   };
 
-  const deleteExpense = (id: string) => {
+  const deleteExpense = async (id: string) => {
     if (!user) return;
-    const updated = expenses.filter((e) => e.id !== id);
-    setExpenses(updated);
-    localStorage.setItem(`safarnama-expenses-${user._id}`, JSON.stringify(updated));
-    toast.success('Expense item removed');
+
+    if (isMock) {
+      const updated = expenses.filter((e) => e.id !== id);
+      setExpenses(updated);
+      localStorage.setItem(`safarnama-expenses-${user._id}`, JSON.stringify(updated));
+      toast.success('Expense item removed');
+    } else {
+      const expToast = toast.loading('Removing expense item...');
+      try {
+        await convex.mutation(api.dashboard.deleteExpense, { token: token || "", id: id as any });
+        toast.success('Expense item removed', { id: expToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to remove expense.', { id: expToast });
+      }
+    }
   };
 
   // --- BLOG SHARING ---
-  const addBlog = (title: string, category: string, excerpt: string, coverImage: string, content: string) => {
+  const addBlog = async (title: string, category: string, excerpt: string, coverImage: string, content: string) => {
     if (!user) {
       toast.error('Please sign in to post a blog');
       return;
     }
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    const newBlog = {
-      id: `blog-${Date.now()}`,
-      slug,
-      title,
-      excerpt,
-      coverImage: coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-      author: { name: user.name, avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' },
-      category,
-      readTime: Math.max(3, Math.ceil(content.split(/\s+/).length / 200)),
-      createdAt: new Date().toISOString().split('T')[0],
-      content,
-      uploadedByUsername: user.username,
-    };
-    const updated = [newBlog, ...blogs];
-    setBlogs(updated);
-    localStorage.setItem('safarnama-global-blogs', JSON.stringify(updated));
-    toast.success('Blog published successfully! ✍️');
+    const defaultImage = coverImage || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800';
+    const readTime = Math.max(3, Math.ceil(content.split(/\s+/).length / 200));
+    const createdAt = new Date().toISOString().split('T')[0];
+
+    if (isMock) {
+      const newBlog = {
+        id: `blog-${Date.now()}`,
+        slug,
+        title,
+        excerpt,
+        coverImage: defaultImage,
+        author: { name: user.name, avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100' },
+        category,
+        readTime,
+        createdAt,
+        content,
+        uploadedByUsername: user.username,
+      };
+      const updated = [newBlog, ...blogs];
+      setBlogs(updated);
+      localStorage.setItem('safarnama-global-blogs', JSON.stringify(updated));
+      toast.success('Blog published successfully! ✍️');
+    } else {
+      const blogToast = toast.loading('Publishing blog to cloud...');
+      try {
+        await convex.mutation(api.content.createBlog, {
+          title,
+          slug,
+          excerpt,
+          coverImage: defaultImage,
+          authorName: user.name,
+          authorAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
+          category,
+          readTime,
+          createdAt,
+          content,
+          uploadedByUsername: user.username,
+        });
+        toast.success('Blog published successfully! ✍️', { id: blogToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to publish blog.', { id: blogToast });
+      }
+    }
   };
 
   // --- PHOTO SHARING WITH IMAGE AESTHETIC RATING ---
@@ -694,32 +956,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Could not load image. Make sure the URL is valid.');
       }
 
-      // Filter out user's previous upload (strict 1 photo upload limit!)
-      const remainingPhotos = allPhotos.filter((p) => p.uploadedByUsername !== user.username);
+      if (isMock) {
+        // Filter out user's previous upload (strict 1 photo upload limit!)
+        const remainingPhotos = allPhotos.filter((p) => p.uploadedByUsername !== user.username);
+        const newPhoto = {
+          id: `photo-${Date.now()}`,
+          src,
+          location,
+          category,
+          uploadedBy: user.name,
+          uploadedByUsername: user.username,
+          score,
+        };
 
-      const newPhoto = {
-        id: `photo-${Date.now()}`,
-        src,
-        location,
-        category,
-        uploadedBy: user.name,
-        uploadedByUsername: user.username,
-        score,
-      };
+        const updated = [...remainingPhotos, newPhoto];
+        setAllPhotos(updated);
+        localStorage.setItem('safarnama-global-all-photos', JSON.stringify(updated));
 
-      const updated = [...remainingPhotos, newPhoto];
-      setAllPhotos(updated);
-      localStorage.setItem('safarnama-global-all-photos', JSON.stringify(updated));
+        // Check if it will be displayed in the gallery (highest score for this location)
+        const locKey = location.toLowerCase().trim();
+        const currentLocPhotos = updated.filter(p => p.location.toLowerCase().trim() === locKey);
+        const isBest = currentLocPhotos.length === 0 || score >= Math.max(...currentLocPhotos.map(p => p.score));
 
-      // Check if it will be displayed in the gallery (highest score for this location)
-      const locKey = location.toLowerCase().trim();
-      const currentLocPhotos = updated.filter(p => p.location.toLowerCase().trim() === locKey);
-      const isBest = currentLocPhotos.length === 0 || score >= Math.max(...currentLocPhotos.map(p => p.score));
-
-      if (isBest) {
-        toast.success(`Aesthetic score: ${score}! Your photo is now featured in the gallery! 🌟`, { id: checkToastId });
+        if (isBest) {
+          toast.success(`Aesthetic score: ${score}! Your photo is now featured in the gallery! 🌟`, { id: checkToastId });
+        } else {
+          toast.success(`Aesthetic score: ${score}. Uploaded! However, another featured photo has a higher score.`, { id: checkToastId });
+        }
       } else {
-        toast.success(`Aesthetic score: ${score}. Uploaded! However, another featured photo has a higher score.`, { id: checkToastId });
+        // Find existing photo by this user in live list
+        const existingPhoto = allPhotos.find((p) => p.uploadedByUsername === user.username);
+        if (existingPhoto) {
+          try {
+            await convex.mutation(api.content.deletePhoto, { id: existingPhoto.id as any });
+          } catch (err) {
+            console.error('Error removing old photo:', err);
+          }
+        }
+
+        await convex.mutation(api.content.uploadPhoto, {
+          src,
+          location,
+          category,
+          uploadedBy: user.name,
+          uploadedByUsername: user.username,
+          score,
+        });
+
+        // Determine featured status based on the live allPhotos list
+        const locKey = location.toLowerCase().trim();
+        const currentLocPhotos = allPhotos.filter(p => p.location.toLowerCase().trim() === locKey);
+        const isBest = currentLocPhotos.length === 0 || score >= Math.max(...currentLocPhotos.map(p => p.score));
+
+        if (isBest) {
+          toast.success(`Aesthetic score: ${score}! Your photo is now featured in the gallery! 🌟`, { id: checkToastId });
+        } else {
+          toast.success(`Aesthetic score: ${score}. Uploaded! However, another featured photo has a higher score.`, { id: checkToastId });
+        }
       }
       return true;
     } catch (e: any) {
@@ -729,27 +1022,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // --- EXPERIENCE SHARING WITH STORY QUALITY RANKING ---
-  const addExperience = (text: string, rating: number, destination: string, location: string) => {
+  const addExperience = async (text: string, rating: number, destination: string, location: string) => {
     if (!user) {
       toast.error('Please sign in to share your story');
       return;
     }
     const score = calculateStoryScore(text, rating);
-    const newExperience = {
-      id: `exp-story-${Date.now()}`,
-      name: user.name,
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
-      location: location || 'Traveler',
-      rating,
-      text,
-      destination,
-      score,
-      uploadedByUsername: user.username,
-    };
-    const updated = [newExperience, ...experiences];
-    setExperiences(updated);
-    localStorage.setItem('safarnama-global-experiences', JSON.stringify(updated));
-    toast.success('Your experience story has been submitted! 📣');
+
+    if (isMock) {
+      const newExperience = {
+        id: `exp-story-${Date.now()}`,
+        name: user.name,
+        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
+        location: location || 'Traveler',
+        rating,
+        text,
+        destination,
+        score,
+        uploadedByUsername: user.username,
+      };
+      const updated = [newExperience, ...experiences];
+      setExperiences(updated);
+      localStorage.setItem('safarnama-global-experiences', JSON.stringify(updated));
+      toast.success('Your experience story has been submitted! 📣');
+    } else {
+      const expToast = toast.loading('Submitting story to cloud...');
+      try {
+        await convex.mutation(api.content.createExperience, {
+          name: user.name,
+          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
+          location: location || 'Traveler',
+          rating,
+          text,
+          destination,
+          score,
+          uploadedByUsername: user.username,
+        });
+        toast.success('Your experience story has been submitted! 📣', { id: expToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to submit experience.', { id: expToast });
+      }
+    }
   };
 
   // Log in
@@ -782,6 +1095,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         saveMockSessions(sessions);
 
         localStorage.setItem('safarnama-auth-token', token);
+        setToken(token);
         const { passwordHash, salt, ...userProfile } = foundUser;
         setUser(userProfile as User);
 
@@ -798,6 +1112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         setUser(result.user as User);
         localStorage.setItem('safarnama-auth-token', result.token);
+        setToken(result.token);
         
         toast.success(`Welcome back, ${result.user.name}!`, { id: loginToastId });
         return true;
@@ -844,11 +1159,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sessions.push({
           userId,
           token,
-          expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+          expiresAt: Date.now() + 30 * 24 * 60 * 65 * 1000,
         });
         saveMockSessions(sessions);
 
         localStorage.setItem('safarnama-auth-token', token);
+        setToken(token);
         const { passwordHash: ph, salt: s, ...userProfile } = newUser;
         setUser(userProfile as User);
 
@@ -868,6 +1184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         setUser(result.user as User);
         localStorage.setItem('safarnama-auth-token', result.token);
+        setToken(result.token);
 
         toast.success(`Account created! Welcome, ${result.user.name}!`, { id: registerToastId });
         return true;
@@ -880,21 +1197,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Log out
   const logout = async () => {
-    const token = localStorage.getItem('safarnama-auth-token');
-    if (token) {
+    const activeToken = localStorage.getItem('safarnama-auth-token');
+    if (activeToken) {
       if (isMock) {
         const sessions = getMockSessions();
-        const remainingSessions = sessions.filter((s) => s.token !== token);
+        const remainingSessions = sessions.filter((s) => s.token !== activeToken);
         saveMockSessions(remainingSessions);
       } else {
         try {
-          await convex.mutation(api.users.logout, { token });
+          await convex.mutation(api.users.logout, { token: activeToken });
         } catch (error) {
           console.error('Error logging out on backend:', error);
         }
       }
     }
     localStorage.removeItem('safarnama-auth-token');
+    setToken(null);
     setUser(null);
     toast.success('Logged out successfully');
   };
@@ -950,7 +1268,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Discovered Destinations by Travelers
-  const saveDiscovery = (discoveryData: Partial<DiscoveredDestination>) => {
+  const saveDiscovery = async (discoveryData: Partial<DiscoveredDestination>) => {
     if (!user) {
       toast.error('Please sign in to share a discovery');
       return;
@@ -984,46 +1302,140 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       creationTime: discoveryData.creationTime || Date.now(),
     };
 
-    let updated = [...discoveredDestinations];
-    if (existingIndex > -1) {
-      updated[existingIndex] = fullDiscovery;
+    if (isMock) {
+      let updated = [...discoveredDestinations];
+      if (existingIndex > -1) {
+        updated[existingIndex] = fullDiscovery;
+      } else {
+        updated.push(fullDiscovery);
+      }
+      setDiscoveredDestinations(updated);
+      localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+
+      if (fullDiscovery.status === 'pending') {
+        toast.success('Discovery submitted for Admin approval! 🚀');
+      } else {
+        toast.success('Discovery draft saved! 📁');
+      }
     } else {
-      updated.push(fullDiscovery);
+      const discoveryToast = toast.loading('Saving discovery to cloud...');
+      try {
+        if (existingIndex > -1) {
+          // Edit existing discovery
+          await convex.mutation(api.content.updateDiscovery, {
+            id: discoveryId as any,
+            name: fullDiscovery.name,
+            tagline: fullDiscovery.tagline,
+            category: fullDiscovery.category,
+            locationDetailed: fullDiscovery.locationDetailed,
+            whyVisit: fullDiscovery.whyVisit,
+            bestTimeToVisit: fullDiscovery.bestTimeToVisit,
+            description: fullDiscovery.description,
+            howToReach: fullDiscovery.howToReach,
+            nearestTransport: fullDiscovery.nearestTransport,
+            entryFee: fullDiscovery.entryFee,
+            averageCost: fullDiscovery.averageCost,
+            isFree: fullDiscovery.isFree,
+            facilities: fullDiscovery.facilities,
+            coverImage: fullDiscovery.coverImage,
+            thingsToCarry: fullDiscovery.thingsToCarry,
+            thingsToAvoid: fullDiscovery.thingsToAvoid,
+            safetyTips: fullDiscovery.safetyTips,
+            tags: fullDiscovery.tags,
+            status: fullDiscovery.status,
+          });
+        } else {
+          // Submit new discovery
+          await convex.mutation(api.content.submitDiscovery, {
+            name: fullDiscovery.name,
+            tagline: fullDiscovery.tagline,
+            category: fullDiscovery.category,
+            locationDetailed: fullDiscovery.locationDetailed,
+            whyVisit: fullDiscovery.whyVisit,
+            bestTimeToVisit: fullDiscovery.bestTimeToVisit,
+            description: fullDiscovery.description,
+            howToReach: fullDiscovery.howToReach,
+            nearestTransport: fullDiscovery.nearestTransport,
+            entryFee: fullDiscovery.entryFee,
+            averageCost: fullDiscovery.averageCost,
+            isFree: fullDiscovery.isFree,
+            facilities: fullDiscovery.facilities,
+            coverImage: fullDiscovery.coverImage,
+            thingsToCarry: fullDiscovery.thingsToCarry,
+            thingsToAvoid: fullDiscovery.thingsToAvoid,
+            safetyTips: fullDiscovery.safetyTips,
+            tags: fullDiscovery.tags,
+            submittedBy: fullDiscovery.submittedBy,
+            submittedByUsername: fullDiscovery.submittedByUsername,
+            status: fullDiscovery.status,
+            creationTime: fullDiscovery.creationTime,
+          });
+        }
+
+        if (fullDiscovery.status === 'pending') {
+          toast.success('Discovery submitted for Admin approval! 🚀', { id: discoveryToast });
+        } else {
+          toast.success('Discovery draft saved! 📁', { id: discoveryToast });
+        }
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to save discovery.', { id: discoveryToast });
+      }
     }
+  };
 
-    setDiscoveredDestinations(updated);
-    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
-
-    if (fullDiscovery.status === 'pending') {
-      toast.success('Discovery submitted for Admin approval! 🚀');
+  const deleteDiscovery = async (id: string) => {
+    if (isMock) {
+      const updated = discoveredDestinations.filter((d) => d.id !== id);
+      setDiscoveredDestinations(updated);
+      localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+      toast.success('Discovery deleted');
     } else {
-      toast.success('Discovery draft saved! 📁');
+      const deleteToast = toast.loading('Deleting discovery...');
+      try {
+        await convex.mutation(api.content.deleteDiscovery, { id: id as any });
+        toast.success('Discovery deleted', { id: deleteToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to delete discovery.', { id: deleteToast });
+      }
     }
   };
 
-  const deleteDiscovery = (id: string) => {
-    const updated = discoveredDestinations.filter((d) => d.id !== id);
-    setDiscoveredDestinations(updated);
-    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
-    toast.success('Discovery deleted');
+  const adminApproveDiscovery = async (id: string) => {
+    if (isMock) {
+      const updated = discoveredDestinations.map((d) =>
+        d.id === id ? { ...d, status: 'approved' as const } : d
+      );
+      setDiscoveredDestinations(updated);
+      localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+      toast.success('Destination approved & published! 🌟');
+    } else {
+      const approveToast = toast.loading('Approving discovery...');
+      try {
+        await convex.mutation(api.content.updateDiscoveryStatus, { id: id as any, status: 'approved' });
+        toast.success('Destination approved & published! 🌟', { id: approveToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to approve discovery.', { id: approveToast });
+      }
+    }
   };
 
-  const adminApproveDiscovery = (id: string) => {
-    const updated = discoveredDestinations.map((d) =>
-      d.id === id ? { ...d, status: 'approved' as const } : d
-    );
-    setDiscoveredDestinations(updated);
-    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
-    toast.success('Destination approved & published! 🌟');
-  };
-
-  const adminRejectDiscovery = (id: string) => {
-    const updated = discoveredDestinations.map((d) =>
-      d.id === id ? { ...d, status: 'rejected' as const } : d
-    );
-    setDiscoveredDestinations(updated);
-    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
-    toast.success('Destination request rejected');
+  const adminRejectDiscovery = async (id: string) => {
+    if (isMock) {
+      const updated = discoveredDestinations.map((d) =>
+        d.id === id ? { ...d, status: 'rejected' as const } : d
+      );
+      setDiscoveredDestinations(updated);
+      localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+      toast.success('Destination request rejected');
+    } else {
+      const rejectToast = toast.loading('Rejecting discovery...');
+      try {
+        await convex.mutation(api.content.updateDiscoveryStatus, { id: id as any, status: 'rejected' });
+        toast.success('Destination request rejected', { id: rejectToast });
+      } catch (e: any) {
+        toast.error(e.message || 'Failed to reject discovery.', { id: rejectToast });
+      }
+    }
   };
 
   return (
