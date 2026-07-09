@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { 
   Heart, MapPin, User, Phone, Lock, Eye, EyeOff, 
   Edit3, LogOut, X, Compass, DollarSign, Calendar, 
   Plus, Trash, Star, Briefcase, ChevronRight,
-  Camera, BookOpen, Send
+  Camera, BookOpen, Send, CheckSquare, Shield
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { destinations } from '../data/destinations'
@@ -22,7 +22,9 @@ export default function DashboardPage() {
     travelScore,
     addBlog,
     allPhotos, uploadGalleryPhoto,
-    addExperience
+    addExperience,
+    discoveredDestinations, saveDiscovery, deleteDiscovery,
+    adminApproveDiscovery, adminRejectDiscovery
   } = useAuth();
 
   // Auth form state
@@ -40,7 +42,12 @@ export default function DashboardPage() {
   const [editPhone, setEditPhone] = useState('');
 
   // Dashboard Nav Tab state
-  const [activeTab, setActiveTab] = useState<'overview' | 'wishlist' | 'visitedPlacesTab' | 'trips' | 'expenses' | 'share' | 'write' | 'profile'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'wishlist' | 'visitedPlacesTab' | 'trips' | 'expenses' | 'share' | 'write' | 'profile' | 'myDiscoveries' | 'adminApprovals'>('overview');
+
+  // Discovery submission states
+  const [showDiscoveryWizard, setShowDiscoveryWizard] = useState(false);
+  const [editingDiscovery, setEditingDiscovery] = useState<any | null>(null);
+  const [showFormPreview, setShowFormPreview] = useState(false);
 
   // Segment sub-tab inside Dashboard Overview
   const [overviewSubTab, setOverviewSubTab] = useState<'wishlist' | 'visited'>('wishlist');
@@ -73,6 +80,16 @@ export default function DashboardPage() {
   const [blogCoverImage, setBlogCoverImage] = useState('');
   const [blogContent, setBlogContent] = useState('');
 
+  // Prefill credentials if routing from Admin Login navbar action
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('prefill') === 'somendra') {
+      setUsername('somendra');
+      setPassword('Somendra@2007');
+      setIsLoginTab(true);
+    }
+  }, []);
+
   // Map slugs to actual destination details
   const savedDestinationsData = savedDestinations
     .map((slug) => destinations.find((d) => d.slug === slug))
@@ -86,6 +103,10 @@ export default function DashboardPage() {
 
   // Calculate statistics
   const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
+
+  // Discoveries filtering
+  const userDiscoveries = discoveredDestinations.filter((d) => d.submittedByUsername === user?.username);
+  const pendingDiscoveries = discoveredDestinations.filter((d) => d.status === 'pending');
 
   // Find user's active uploaded photo (max 1 photo constraint)
   const userPhoto = allPhotos.find((p) => p.uploadedByUsername === user?.username);
@@ -167,6 +188,46 @@ export default function DashboardPage() {
     setBlogExcerpt('');
     setBlogCoverImage('');
     setBlogContent('');
+  };
+
+  const handleSaveDiscoveryForm = (e: React.FormEvent, status: 'draft' | 'pending') => {
+    e.preventDefault();
+    const target = e.target as any;
+    
+    const facilitiesList = [
+      'Parking', 'Washroom', 'Drinking Water', 'Food Available', 
+      'Hotels Nearby', 'Camping Allowed', 'Wheelchair Accessible', 
+      'Mobile Network', 'ATM nearby', 'Petrol Pump'
+    ].filter(fac => target[`fac_${fac.replace(/\s+/g, '')}`]?.checked);
+
+    const tagsList = target.tags.value.split(',').map((t: string) => t.trim()).filter(Boolean);
+
+    saveDiscovery({
+      id: editingDiscovery?.id || undefined,
+      name: target.discoveryName.value,
+      tagline: target.tagline.value,
+      category: target.category.value,
+      locationDetailed: target.locationDetailed.value,
+      whyVisit: target.whyVisit.value,
+      bestTimeToVisit: target.bestTimeToVisit.value,
+      description: target.description.value,
+      howToReach: target.howToReach.value,
+      nearestTransport: target.nearestTransport.value,
+      entryFee: parseFloat(target.entryFee.value) || 0,
+      averageCost: parseFloat(target.averageCost.value) || 0,
+      isFree: target.isFree.checked,
+      facilities: facilitiesList,
+      coverImage: target.coverImage.value || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
+      thingsToCarry: target.thingsToCarry.value,
+      thingsToAvoid: target.thingsToAvoid.value,
+      safetyTips: target.safetyTips.value,
+      tags: tagsList,
+      status: status
+    });
+    
+    setShowDiscoveryWizard(false);
+    setEditingDiscovery(null);
+    setShowFormPreview(false);
   };
 
 
@@ -373,39 +434,60 @@ export default function DashboardPage() {
 
                   {/* Sidebar Nav Items */}
                   <nav className="space-y-1">
-                    {[
-                      { id: 'overview', name: 'Dashboard', icon: Compass },
-                      { id: 'wishlist', name: 'Wishlist', icon: Heart, badge: savedDestinations.length },
-                      { id: 'visitedPlacesTab', name: 'Visited Places', icon: MapPin, badge: visitedPlaces.length },
-                      { id: 'trips', name: 'My Trip Plans', icon: Briefcase, badge: tripPlans.length },
-                      { id: 'expenses', name: 'Expense Tracker', icon: DollarSign },
-                      { id: 'share', name: 'Share Photo & Story', icon: Camera },
-                      { id: 'write', name: 'Write Travel Blog', icon: Edit3 },
-                      { id: 'profile', name: 'Profile Settings', icon: User },
-                    ].map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => setActiveTab(item.id as any)}
-                        className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                          activeTab === item.id
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/15'
-                            : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.name}</span>
-                        </div>
-                        {item.badge !== undefined && item.badge > 0 && (
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full ${
-                            activeTab === item.id ? 'bg-white/20 text-white' : 'bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
-                          }`}>
-                            {item.badge}
-                          </span>
-                        )}
-                      </button>
-                    ))}
+                    {(() => {
+                      const navItems = [
+                        { id: 'overview', name: 'Dashboard', icon: Compass },
+                        { id: 'wishlist', name: 'Wishlist', icon: Heart, badge: savedDestinations.length },
+                        { id: 'visitedPlacesTab', name: 'Visited Places', icon: MapPin, badge: visitedPlaces.length },
+                        { id: 'myDiscoveries', name: 'My Discoveries', icon: Eye, badge: userDiscoveries.length },
+                        { id: 'trips', name: 'My Trip Plans', icon: Briefcase, badge: tripPlans.length },
+                        { id: 'expenses', name: 'Expense Tracker', icon: DollarSign },
+                        { id: 'share', name: 'Share Photo & Story', icon: Camera },
+                        { id: 'write', name: 'Write Travel Blog', icon: Edit3 },
+                        { id: 'profile', name: 'Profile Settings', icon: User },
+                      ];
+
+                      if (user?.username === 'somendra') {
+                        navItems.splice(4, 0, { id: 'adminApprovals', name: 'Admin Panel', icon: Shield, badge: pendingDiscoveries.length });
+                      }
+
+                      return navItems.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => setActiveTab(item.id as any)}
+                          className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                            activeTab === item.id
+                              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/15'
+                              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800/50 hover:text-gray-900 dark:hover:text-white'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <item.icon className="w-4 h-4" />
+                            <span>{item.name}</span>
+                          </div>
+                          {item.badge !== undefined && item.badge > 0 && (
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full ${
+                              activeTab === item.id ? 'bg-white/20 text-white' : 'bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400'
+                            }`}>
+                              {item.badge}
+                            </span>
+                          )}
+                        </button>
+                      ));
+                    })()}
                   </nav>
+
+                  {/* Share Discovery Button */}
+                  <button
+                    onClick={() => {
+                      setEditingDiscovery(null);
+                      setShowDiscoveryWizard(true);
+                    }}
+                    className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-650 hover:from-orange-600 hover:to-red-700 text-white rounded-xl text-xs font-extrabold shadow-md shadow-orange-500/10 hover:shadow-orange-500/20 transition-all transform hover:-translate-y-0.5"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Share Your Discovery
+                  </button>
                 </div>
 
                 <div className="mt-8 pt-4 border-t border-gray-200/50 dark:border-gray-800/40 space-y-3">
@@ -1384,6 +1466,215 @@ export default function DashboardPage() {
                       )}
                     </motion.div>
                   )}
+
+                  {/* MY DISCOVERIES TAB */}
+                  {activeTab === 'myDiscoveries' && (
+                    <motion.div
+                      key="tab-my-discoveries"
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -15 }}
+                      className="space-y-6"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Shared Discoveries</h2>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">Manage and track travel destinations you have discovered and submitted.</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setEditingDiscovery(null);
+                            setShowDiscoveryWizard(true);
+                          }}
+                          className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-semibold shadow-sm hover:bg-blue-700 transition-colors"
+                        >
+                          <Plus className="w-4 h-4" /> Share Location
+                        </button>
+                      </div>
+
+                      {userDiscoveries.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {userDiscoveries.map((discovery) => (
+                            <div key={discovery.id} className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group">
+                              <div className="relative h-44 overflow-hidden bg-gray-100 dark:bg-gray-950">
+                                <img 
+                                  src={discovery.coverImage} 
+                                  alt={discovery.name} 
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                                <div className="absolute top-3 left-3 flex gap-1.5">
+                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-sm uppercase ${
+                                    discovery.status === 'approved' ? 'bg-green-600' :
+                                    discovery.status === 'pending' ? 'bg-amber-500 animate-pulse' :
+                                    discovery.status === 'rejected' ? 'bg-red-650' : 'bg-gray-500'
+                                  }`}>
+                                    {discovery.status === 'pending' ? 'Pending Approval' : discovery.status}
+                                  </span>
+                                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-sm uppercase">
+                                    {discovery.category}
+                                  </span>
+                                </div>
+                                <button 
+                                  onClick={() => deleteDiscovery(discovery.id)}
+                                  className="absolute top-3 right-3 p-1.5 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-full shadow-md text-red-500 hover:scale-105 transition-transform"
+                                >
+                                  <Trash className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+
+                              <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                                <div className="space-y-1">
+                                  <span className="text-[10px] text-gray-400 font-semibold uppercase">{discovery.locationDetailed}</span>
+                                  <h3 className="font-bold text-gray-900 dark:text-white text-lg mt-0.5">{discovery.name}</h3>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium italic">"{discovery.tagline}"</p>
+                                  <p className="text-xs text-gray-650 dark:text-gray-300 line-clamp-2 mt-2 leading-relaxed">{discovery.description}</p>
+                                </div>
+
+                                <div className="flex gap-2 justify-end pt-3 border-t border-gray-100 dark:border-gray-800">
+                                  {discovery.status === 'draft' && (
+                                    <button 
+                                      onClick={() => {
+                                        setEditingDiscovery(discovery);
+                                        setShowDiscoveryWizard(true);
+                                      }}
+                                      className="px-3.5 py-1.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white rounded-lg text-xs font-semibold transition-all"
+                                    >
+                                      Edit Draft
+                                    </button>
+                                  )}
+                                  <button 
+                                    onClick={() => setEditingDiscovery(discovery)}
+                                    className="px-3.5 py-1.5 bg-gray-50 dark:bg-gray-850 hover:bg-gray-150 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-semibold transition-all"
+                                  >
+                                    View Details
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-20 bg-white dark:bg-gray-900 border border-dashed border-gray-200 dark:border-gray-800 rounded-3xl">
+                          <Eye className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">No discoveries shared yet</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">
+                            Did you find an amazing place that is not listed? Share it with the community and let others discover it!
+                          </p>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+
+                  {/* ADMIN APPROVALS PANEL */}
+                  {activeTab === 'adminApprovals' && user?.username === 'somendra' && (
+                    <motion.div
+                      key="tab-admin-approvals"
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -15 }}
+                      className="space-y-6"
+                    >
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Approval Panel</h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Review traveler discoveries and approve or reject their publish requests.</p>
+                      </div>
+
+                      {pendingDiscoveries.length > 0 ? (
+                        <div className="space-y-4">
+                          {pendingDiscoveries.map((discovery) => (
+                            <div key={discovery.id} className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl p-6 shadow-sm space-y-4">
+                              <div className="flex flex-col md:flex-row gap-6">
+                                <div className="w-full md:w-48 h-32 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-950 shrink-0">
+                                  <img src={discovery.coverImage} alt={discovery.name} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="flex-1 space-y-2">
+                                  <div className="flex justify-between items-start">
+                                    <div>
+                                      <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-full">
+                                        {discovery.category}
+                                      </span>
+                                      <h3 className="font-bold text-lg text-gray-900 dark:text-white mt-1">{discovery.name}</h3>
+                                      <p className="text-xs text-gray-450 font-medium">Location: {discovery.locationDetailed}</p>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="text-xs text-gray-500 font-semibold block">Submitted by:</span>
+                                      <span className="text-xs font-bold text-gray-900 dark:text-white">@{discovery.submittedByUsername} ({discovery.submittedBy})</span>
+                                    </div>
+                                  </div>
+                                  <p className="text-xs text-gray-650 dark:text-gray-300 italic">"{discovery.tagline}"</p>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3 leading-relaxed mt-1">{discovery.description}</p>
+                                </div>
+                              </div>
+
+                              {/* Accordion Expanded Details */}
+                              <div className="bg-gray-50 dark:bg-gray-950/40 p-4 rounded-xl space-y-3 text-xs">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <span className="font-bold text-gray-400 block uppercase tracking-wider text-[10px]">Why Visit:</span>
+                                    <p className="text-gray-700 dark:text-gray-300 mt-0.5">{discovery.whyVisit}</p>
+                                  </div>
+                                  <div>
+                                    <span className="font-bold text-gray-400 block uppercase tracking-wider text-[10px]">Best Time & Transport:</span>
+                                    <p className="text-gray-700 dark:text-gray-300 mt-0.5">{discovery.bestTimeToVisit} • {discovery.nearestTransport}</p>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-2 border-gray-200/50 dark:border-gray-800/40">
+                                  <div>
+                                    <span className="font-bold text-gray-400 block uppercase tracking-wider text-[10px]">How to Reach:</span>
+                                    <p className="text-gray-700 dark:text-gray-300 mt-0.5">{discovery.howToReach}</p>
+                                  </div>
+                                  <div>
+                                    <span className="font-bold text-gray-400 block uppercase tracking-wider text-[10px]">Budget & Entry Fee:</span>
+                                    <p className="text-gray-700 dark:text-gray-300 mt-0.5">
+                                      {discovery.isFree ? 'Free to visit' : `Entry: ₹${discovery.entryFee} • Average Spend: ₹${discovery.averageCost}`}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="border-t pt-2 border-gray-200/50 dark:border-gray-800/40">
+                                  <span className="font-bold text-gray-400 block uppercase tracking-wider text-[10px]">Available Facilities:</span>
+                                  <div className="flex flex-wrap gap-1.5 mt-1">
+                                    {discovery.facilities.map(f => (
+                                      <span key={f} className="bg-gray-200/60 dark:bg-gray-800 px-2 py-0.5 rounded text-[10px] text-gray-650 dark:text-gray-300 font-semibold">{f}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="border-t pt-2 border-gray-200/50 dark:border-gray-800/40">
+                                  <span className="font-bold text-gray-400 block uppercase tracking-wider text-[10px]">Tips & Tags:</span>
+                                  <p className="text-gray-700 dark:text-gray-300 mt-0.5"><span className="font-semibold text-gray-400">Carry:</span> {discovery.thingsToCarry} | <span className="font-semibold text-gray-400">Avoid:</span> {discovery.thingsToAvoid} | <span className="font-semibold text-gray-400">Safety:</span> {discovery.safetyTips}</p>
+                                  <div className="flex flex-wrap gap-1.5 mt-2">
+                                    {discovery.tags.map(t => (
+                                      <span key={t} className="bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full text-[9px] font-bold">#{t}</span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="flex gap-3 justify-end pt-2">
+                                <button
+                                  onClick={() => adminApproveDiscovery(discovery.id)}
+                                  className="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold shadow-sm transition-colors"
+                                >
+                                  Approve & Publish
+                                </button>
+                                <button
+                                  onClick={() => adminRejectDiscovery(discovery.id)}
+                                  className="px-5 py-2 bg-red-600 hover:bg-red-750 text-white rounded-xl text-xs font-bold shadow-sm transition-colors"
+                                >
+                                  Reject Request
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-20 bg-white dark:bg-gray-900 border border-dashed border-gray-200 dark:border-gray-800 rounded-3xl">
+                          <CheckSquare className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">All requests reviewed</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">There are no pending traveler-discovered destinations for review.</p>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
                 </AnimatePresence>
               </div>
             </div>
@@ -1562,6 +1853,443 @@ export default function DashboardPage() {
           </div>
         );
       })()}
+
+      {/* --- TRAVELER DISCOVERY WIZARD MODAL --- */}
+      {showDiscoveryWizard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-3xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+          >
+            <div className="p-6 border-b border-gray-150 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-950/20">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-full">Explorer Program</span>
+                <h3 className="text-xl font-extrabold text-gray-900 dark:text-white mt-1.5">
+                  {editingDiscovery ? 'Edit Travel Discovery' : 'Share Your Travel Discovery'}
+                </h3>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowDiscoveryWizard(false);
+                  setEditingDiscovery(null);
+                  setShowFormPreview(false);
+                }}
+                className="p-1.5 text-gray-400 hover:text-gray-650 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* If Preview mode is active, render preview screen. Otherwise, form screen */}
+            {showFormPreview ? (
+              <div className="p-6 overflow-y-auto space-y-6 flex-1 bg-gray-50/50 dark:bg-gray-950/10">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30 rounded-2xl text-xs text-blue-800 dark:text-blue-300">
+                  ℹ️ This is a layout preview of how your discovered destination will be presented to other travelers.
+                </div>
+                
+                {/* Visual Preview Card */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200/60 dark:border-gray-800/60 rounded-3xl overflow-hidden shadow-md max-w-xl mx-auto">
+                  <div className="relative h-56 bg-gray-100 dark:bg-gray-950">
+                    <img 
+                      id="preview-img" 
+                      src={(document.getElementById('discoveryForm') as any)?.coverImage?.value || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800'} 
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as any).src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800';
+                      }}
+                    />
+                    <div className="absolute top-4 left-4 flex gap-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-600 text-white rounded-full uppercase">
+                        {(document.getElementById('discoveryForm') as any)?.category?.value || 'Mountains'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">
+                        {(document.getElementById('discoveryForm') as any)?.locationDetailed?.value || 'Detailed Location'}
+                      </span>
+                      <h4 className="text-xl font-bold text-gray-900 dark:text-white mt-1">
+                        {(document.getElementById('discoveryForm') as any)?.discoveryName?.value || 'Destination Name'}
+                      </h4>
+                      <p className="text-xs font-semibold text-gray-500 italic mt-0.5">
+                        "{(document.getElementById('discoveryForm') as any)?.tagline?.value || 'Short Tagline'}"
+                      </p>
+                    </div>
+
+                    <div className="space-y-1 text-xs">
+                      <span className="font-bold text-gray-500 block uppercase tracking-wider text-[9px]">Why Visit:</span>
+                      <p className="text-gray-650 dark:text-gray-300">{(document.getElementById('discoveryForm') as any)?.whyVisit?.value || 'About the place...'}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 text-xs border-t pt-3 border-gray-100 dark:border-gray-800">
+                      <div>
+                        <span className="font-bold text-gray-400 uppercase tracking-wider text-[9px] block">Best Time:</span>
+                        <p className="font-semibold text-gray-800 dark:text-gray-200">{(document.getElementById('discoveryForm') as any)?.bestTimeToVisit?.value || 'Winter'}</p>
+                      </div>
+                      <div>
+                        <span className="font-bold text-gray-400 uppercase tracking-wider text-[9px] block">Nearest Station:</span>
+                        <p className="font-semibold text-gray-800 dark:text-gray-200">{(document.getElementById('discoveryForm') as any)?.nearestTransport?.value || 'Local Bus'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-150 dark:border-gray-800">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowFormPreview(false)}
+                    className="px-5 py-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition-all"
+                  >
+                    Back to Edit
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const formEl = document.getElementById('discoveryForm') as HTMLFormElement;
+                      if (formEl) {
+                        const event = new Event('submit', { cancelable: true, bubbles: true });
+                        (event as any).submitStatus = 'pending';
+                        formEl.dispatchEvent(event);
+                      }
+                    }}
+                    className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+                  >
+                    Submit for Approval
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form 
+                id="discoveryForm"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const submitStatus = (e.nativeEvent as any).submitter?.getAttribute('data-status') || (e as any).submitStatus || 'draft';
+                  handleSaveDiscoveryForm(e, submitStatus);
+                }}
+                className="p-6 overflow-y-auto space-y-6 flex-1"
+              >
+                {/* 1. Basic Information */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">1. Basic Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Destination Name*</label>
+                      <input type="text" required name="discoveryName" defaultValue={editingDiscovery?.name || ""} placeholder="e.g. Tirthan Valley" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Tagline*</label>
+                      <input type="text" required name="tagline" defaultValue={editingDiscovery?.tagline || ""} placeholder="e.g. A serene trout paradise" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Category*</label>
+                      <select name="category" defaultValue={editingDiscovery?.category || "Mountains"} className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none">
+                        <option value="Mountains">Mountains</option>
+                        <option value="Beaches">Beaches</option>
+                        <option value="Spiritual">Spiritual</option>
+                        <option value="Heritage">Heritage</option>
+                        <option value="Lakes">Lakes</option>
+                        <option value="Waterfalls">Waterfalls</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Forest">Forest</option>
+                        <option value="Desert">Desert</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Detailed Location */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">2. Detailed Location</h4>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Detailed Address / State & District*</label>
+                    <input type="text" required name="locationDetailed" defaultValue={editingDiscovery?.locationDetailed || ""} placeholder="e.g. Kullu District, Himachal Pradesh" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                  </div>
+                </div>
+
+                {/* 3. About the Destination */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">3. About the Destination</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Why should people visit?*</label>
+                      <input type="text" required name="whyVisit" defaultValue={editingDiscovery?.whyVisit || ""} placeholder="e.g. Untouched nature, fishing, river treks" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Best time to visit*</label>
+                      <input type="text" required name="bestTimeToVisit" defaultValue={editingDiscovery?.bestTimeToVisit || ""} placeholder="e.g. March to June & October to November" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Detailed Description*</label>
+                    <textarea required name="description" rows={3} defaultValue={editingDiscovery?.description || ""} placeholder="Write a brief overview describing the beauty of this hidden place..." className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                  </div>
+                </div>
+
+                {/* 4. Travel Details */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">4. Travel Details</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">How to reach (Directions)*</label>
+                      <input type="text" required name="howToReach" defaultValue={editingDiscovery?.howToReach || ""} placeholder="e.g. Take overnight bus from Delhi to Aut, then local cab" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Nearest Transportation Hub (Airport/Train)*</label>
+                      <input type="text" required name="nearestTransport" defaultValue={editingDiscovery?.nearestTransport || ""} placeholder="e.g. Bhuntar Airport (Airport) or Joginder Nagar (Train)" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 5. Budget */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">5. Budget</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Entry Fee (₹)</label>
+                      <input type="number" name="entryFee" defaultValue={editingDiscovery?.entryFee || 0} className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Average cost per person (₹)*</label>
+                      <input type="number" required name="averageCost" defaultValue={editingDiscovery?.averageCost || 0} placeholder="e.g. 3000" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="flex items-center gap-2 pb-2.5">
+                      <input type="checkbox" id="isFree" name="isFree" defaultChecked={editingDiscovery?.isFree || false} className="rounded border-gray-350 text-blue-600 focus:ring-blue-500" />
+                      <label htmlFor="isFree" className="text-xs font-semibold text-gray-500">Is it Free to Visit?</label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 6. Facilities Checkboxes */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">6. Facilities</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    {[
+                      'Parking', 'Washroom', 'Drinking Water', 'Food Available', 
+                      'Hotels Nearby', 'Camping Allowed', 'Wheelchair Accessible', 
+                      'Mobile Network', 'ATM nearby', 'Petrol Pump'
+                    ].map(fac => {
+                      const formattedName = fac.replace(/\s+/g, '');
+                      const isChecked = editingDiscovery?.facilities?.includes(fac);
+                      return (
+                        <div key={fac} className="flex items-center gap-2">
+                          <input type="checkbox" id={`fac_${formattedName}`} name={`fac_${formattedName}`} defaultChecked={isChecked} className="rounded border-gray-350 text-blue-600 focus:ring-blue-500" />
+                          <label htmlFor={`fac_${formattedName}`} className="text-[11px] font-semibold text-gray-650 dark:text-gray-400 leading-none">{fac}</label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 7. Upload Media */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">7. Upload Media</h4>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Cover Image URL* (accepts any image link)</label>
+                    <input type="text" required name="coverImage" defaultValue={editingDiscovery?.coverImage || ""} placeholder="https://images.unsplash.com/photo-..." className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                  </div>
+                </div>
+
+                {/* 8. Tips */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">8. Tips</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Things to Carry*</label>
+                      <input type="text" required name="thingsToCarry" defaultValue={editingDiscovery?.thingsToCarry || ""} placeholder="e.g. Trekking shoes, warm jacket" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Things to Avoid*</label>
+                      <input type="text" required name="thingsToAvoid" defaultValue={editingDiscovery?.thingsToAvoid || ""} placeholder="e.g. Do not litter, avoid monsoon nights" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-gray-500">Safety Tips*</label>
+                      <input type="text" required name="safetyTips" defaultValue={editingDiscovery?.safetyTips || ""} placeholder="e.g. Keep map offline, check landslides reports" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 9. Tags */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">9. Tags</h4>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-500">Tags (comma-separated list)*</label>
+                    <input type="text" required name="tags" defaultValue={editingDiscovery?.tags?.join(', ') || "Nature photography, Sunrise, Sunset, Hidden gem"} placeholder="e.g. Family Trekking, Sunrise, Sunset, Camping, Hidden gem" className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 text-gray-950 dark:text-white text-sm focus:outline-none" />
+                  </div>
+                </div>
+
+                {/* 10. Attribute */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold text-blue-650 dark:text-blue-400 uppercase tracking-wider border-b pb-1 border-gray-100 dark:border-gray-800">10. Attribute</h4>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-gray-400">Discoverer Name (Prefilled)</label>
+                    <input type="text" readOnly value={user?.name} className="w-full px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-950 text-gray-500 text-sm cursor-not-allowed focus:outline-none" />
+                  </div>
+                </div>
+
+                {/* 11. Confirmation */}
+                <div className="flex items-start gap-2.5 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-xl">
+                  <input type="checkbox" required id="confirmAccurate" className="mt-0.5 rounded border-gray-350 text-blue-600 focus:ring-blue-500" />
+                  <label htmlFor="confirmAccurate" className="text-xs font-semibold text-gray-650 dark:text-gray-400 leading-normal">
+                    11. I confirm that the information submitted above is accurate to the best of my knowledge, and I understand it will be peer-reviewed by the site administrator before publication.
+                  </label>
+                </div>
+
+                {/* 12. Buttons */}
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-150 dark:border-gray-800 justify-end">
+                  <button 
+                    type="submit" 
+                    data-status="draft"
+                    className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold transition-all"
+                  >
+                    Save as Draft
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setShowFormPreview(true);
+                    }}
+                    className="px-5 py-2.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold transition-all"
+                  >
+                    Preview Layout
+                  </button>
+                  <button 
+                    type="submit" 
+                    data-status="pending"
+                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+                  >
+                    Submit Destination
+                  </button>
+                </div>
+              </form>
+            )}
+          </motion.div>
+        </div>
+      )}
+
+      {/* --- TRAVELER DISCOVERY DETAIL MODAL --- */}
+      {editingDiscovery && !showDiscoveryWizard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col"
+          >
+            <div className="p-6 border-b border-gray-150 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-950/20">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-full">{editingDiscovery.category}</span>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-1">{editingDiscovery.name}</h3>
+                <p className="text-xs text-gray-400 font-medium">Discovered by: {editingDiscovery.submittedBy} (@{editingDiscovery.submittedByUsername})</p>
+              </div>
+              <button 
+                onClick={() => setEditingDiscovery(null)}
+                className="p-1.5 text-gray-400 hover:text-gray-650 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+              <div className="relative h-56 rounded-2xl overflow-hidden bg-gray-150 dark:bg-gray-950">
+                <img src={editingDiscovery.coverImage} alt={editingDiscovery.name} className="w-full h-full object-cover" />
+                <div className="absolute top-3 left-3">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full text-white shadow-sm uppercase ${
+                    editingDiscovery.status === 'approved' ? 'bg-green-600' :
+                    editingDiscovery.status === 'pending' ? 'bg-amber-500 animate-pulse' :
+                    editingDiscovery.status === 'rejected' ? 'bg-red-650' : 'bg-gray-500'
+                  }`}>
+                    Status: {editingDiscovery.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">Description & Highlights</h4>
+                  <p className="text-gray-650 dark:text-gray-350 leading-relaxed mt-1">{editingDiscovery.description}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 border-t pt-4 border-gray-100 dark:border-gray-800">
+                  <div>
+                    <span className="font-bold text-gray-405 uppercase tracking-wider text-[10px] block">Why Visit:</span>
+                    <p className="text-gray-750 dark:text-gray-300 mt-0.5">{editingDiscovery.whyVisit}</p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-405 uppercase tracking-wider text-[10px] block">Best Time to Visit:</span>
+                    <p className="text-gray-750 dark:text-gray-300 mt-0.5">{editingDiscovery.bestTimeToVisit}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 border-t pt-4 border-gray-100 dark:border-gray-800">
+                  <div>
+                    <span className="font-bold text-gray-405 uppercase tracking-wider text-[10px] block">How to Reach:</span>
+                    <p className="text-gray-750 dark:text-gray-300 mt-0.5">{editingDiscovery.howToReach}</p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-405 uppercase tracking-wider text-[10px] block">Nearest Transport:</span>
+                    <p className="text-gray-750 dark:text-gray-300 mt-0.5">{editingDiscovery.nearestTransport}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 border-t pt-4 border-gray-100 dark:border-gray-800">
+                  <div>
+                    <span className="font-bold text-gray-405 uppercase tracking-wider text-[10px] block">Budget Details:</span>
+                    <p className="text-gray-750 dark:text-gray-300 mt-0.5">
+                      {editingDiscovery.isFree ? 'Free to visit!' : `Entry Fee: ₹${editingDiscovery.entryFee} | Avg Cost: ₹${editingDiscovery.averageCost}`}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-bold text-gray-450 uppercase tracking-wider text-[10px] block">Facilities:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {editingDiscovery.facilities.map((f: string) => (
+                        <span key={f} className="bg-gray-100 dark:bg-gray-805 px-2 py-0.5 rounded text-[9px] text-gray-600 dark:text-gray-400 font-semibold">{f}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 border-gray-100 dark:border-gray-800 space-y-2">
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm">Travel Tips</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="bg-blue-50/50 dark:bg-blue-950/20 p-3 rounded-xl">
+                      <span className="font-bold text-blue-650 dark:text-blue-400 block mb-0.5">👜 Carry</span>
+                      <p className="text-gray-650 dark:text-gray-350">{editingDiscovery.thingsToCarry}</p>
+                    </div>
+                    <div className="bg-red-50/50 dark:bg-red-950/20 p-3 rounded-xl">
+                      <span className="font-bold text-red-650 dark:text-red-400 block mb-0.5">🚫 Avoid</span>
+                      <p className="text-gray-650 dark:text-gray-350">{editingDiscovery.thingsToAvoid}</p>
+                    </div>
+                    <div className="bg-green-50/50 dark:bg-green-950/20 p-3 rounded-xl">
+                      <span className="font-bold text-green-650 dark:text-green-400 block mb-0.5">🛡️ Safety</span>
+                      <p className="text-gray-650 dark:text-gray-355">{editingDiscovery.safetyTips}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 border-gray-100 dark:border-gray-800">
+                  <span className="font-bold text-gray-404 uppercase tracking-wider text-[10px] block mb-1">Tags:</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {editingDiscovery.tags.map((t: string) => (
+                      <span key={t} className="bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-bold">#{t}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-150 dark:border-gray-850 bg-gray-50/50 dark:bg-gray-950/25 flex justify-end">
+              <button 
+                onClick={() => setEditingDiscovery(null)}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all"
+              >
+                Close View
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </main>
   );
 }

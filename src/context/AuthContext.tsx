@@ -24,6 +24,32 @@ export interface VisitedLog {
   date: number;
 }
 
+export interface DiscoveredDestination {
+  id: string;
+  name: string;
+  tagline: string;
+  category: string;
+  locationDetailed: string;
+  whyVisit: string;
+  bestTimeToVisit: string;
+  description: string;
+  howToReach: string;
+  nearestTransport: string;
+  entryFee: number;
+  averageCost: number;
+  isFree: boolean;
+  facilities: string[];
+  coverImage: string;
+  thingsToCarry: string;
+  thingsToAvoid: string;
+  safetyTips: string;
+  tags: string[];
+  submittedBy: string;
+  submittedByUsername: string;
+  status: 'draft' | 'pending' | 'approved' | 'rejected';
+  creationTime: number;
+}
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
@@ -72,6 +98,13 @@ interface AuthContextType {
   // Travel Score Gamification
   travelScore: number;
 
+  // Discovered Destinations by Travelers
+  discoveredDestinations: DiscoveredDestination[];
+  saveDiscovery: (discoveryData: Partial<DiscoveredDestination>) => void;
+  deleteDiscovery: (id: string) => void;
+  adminApproveDiscovery: (id: string) => void;
+  adminRejectDiscovery: (id: string) => void;
+
   // Shared Website Data (Blogs, Gallery, Testimonials)
   blogs: any[];
   addBlog: (title: string, category: string, excerpt: string, coverImage: string, content: string) => void;
@@ -99,7 +132,23 @@ async function hashPassword(password: string, salt: string): Promise<string> {
 // --- MOCK DATABASE HELPER (localStorage) ---
 const getMockUsers = (): any[] => {
   const usersJson = localStorage.getItem('safarnama-mock-users');
-  return usersJson ? JSON.parse(usersJson) : [];
+  const users = usersJson ? JSON.parse(usersJson) : [];
+  
+  // Seed default admin if not present
+  if (users.length === 0 || !users.some((u: any) => u.username === 'somendra')) {
+    const defaultAdmin = {
+      _id: 'mock-user-admin',
+      _creationTime: Date.now(),
+      username: 'somendra',
+      passwordHash: '51d8d7aabfe1e07d3840434661fd8f81016e543ada7054cae8ba3d7f0095198c',
+      salt: 'adminsalt',
+      name: 'Somendra',
+      phone: '9999999999'
+    };
+    users.push(defaultAdmin);
+    localStorage.setItem('safarnama-mock-users', JSON.stringify(users));
+  }
+  return users;
 };
 
 const saveMockUsers = (users: any[]) => {
@@ -325,6 +374,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [galleryPhotos, setGalleryPhotos] = useState<any[]>([]);
   const [experiences, setExperiences] = useState<any[]>([]);
   const [landingPageStories, setLandingPageStories] = useState<any[]>([]);
+  const [discoveredDestinations, setDiscoveredDestinations] = useState<DiscoveredDestination[]>([]);
 
   // Determine if we should run in Mock Mode
   const convexUrl = import.meta.env.VITE_CONVEX_URL || '';
@@ -340,6 +390,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const savedExperiences = localStorage.getItem('safarnama-global-experiences');
     setExperiences(savedExperiences ? JSON.parse(savedExperiences) : defaultTestimonials);
+
+    const savedDiscoveries = localStorage.getItem('safarnama-global-discoveries');
+    setDiscoveredDestinations(savedDiscoveries ? JSON.parse(savedDiscoveries) : []);
   }, []);
 
   // Compute Landing Page Stories and Gallery display pictures when variables change
@@ -896,6 +949,83 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Discovered Destinations by Travelers
+  const saveDiscovery = (discoveryData: Partial<DiscoveredDestination>) => {
+    if (!user) {
+      toast.error('Please sign in to share a discovery');
+      return;
+    }
+    const discoveryId = discoveryData.id || `discovery-${Date.now()}`;
+    const existingIndex = discoveredDestinations.findIndex((d) => d.id === discoveryId);
+
+    const fullDiscovery: DiscoveredDestination = {
+      id: discoveryId,
+      name: discoveryData.name || '',
+      tagline: discoveryData.tagline || '',
+      category: discoveryData.category || 'Mountains',
+      locationDetailed: discoveryData.locationDetailed || '',
+      whyVisit: discoveryData.whyVisit || '',
+      bestTimeToVisit: discoveryData.bestTimeToVisit || '',
+      description: discoveryData.description || '',
+      howToReach: discoveryData.howToReach || '',
+      nearestTransport: discoveryData.nearestTransport || '',
+      entryFee: discoveryData.entryFee || 0,
+      averageCost: discoveryData.averageCost || 0,
+      isFree: discoveryData.isFree ?? false,
+      facilities: discoveryData.facilities || [],
+      coverImage: discoveryData.coverImage || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
+      thingsToCarry: discoveryData.thingsToCarry || '',
+      thingsToAvoid: discoveryData.thingsToAvoid || '',
+      safetyTips: discoveryData.safetyTips || '',
+      tags: discoveryData.tags || [],
+      submittedBy: user.name,
+      submittedByUsername: user.username,
+      status: discoveryData.status || 'draft',
+      creationTime: discoveryData.creationTime || Date.now(),
+    };
+
+    let updated = [...discoveredDestinations];
+    if (existingIndex > -1) {
+      updated[existingIndex] = fullDiscovery;
+    } else {
+      updated.push(fullDiscovery);
+    }
+
+    setDiscoveredDestinations(updated);
+    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+
+    if (fullDiscovery.status === 'pending') {
+      toast.success('Discovery submitted for Admin approval! 🚀');
+    } else {
+      toast.success('Discovery draft saved! 📁');
+    }
+  };
+
+  const deleteDiscovery = (id: string) => {
+    const updated = discoveredDestinations.filter((d) => d.id !== id);
+    setDiscoveredDestinations(updated);
+    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+    toast.success('Discovery deleted');
+  };
+
+  const adminApproveDiscovery = (id: string) => {
+    const updated = discoveredDestinations.map((d) =>
+      d.id === id ? { ...d, status: 'approved' as const } : d
+    );
+    setDiscoveredDestinations(updated);
+    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+    toast.success('Destination approved & published! 🌟');
+  };
+
+  const adminRejectDiscovery = (id: string) => {
+    const updated = discoveredDestinations.map((d) =>
+      d.id === id ? { ...d, status: 'rejected' as const } : d
+    );
+    setDiscoveredDestinations(updated);
+    localStorage.setItem('safarnama-global-discoveries', JSON.stringify(updated));
+    toast.success('Destination request rejected');
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -924,6 +1054,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addExpense,
         deleteExpense,
         travelScore,
+        discoveredDestinations,
+        saveDiscovery,
+        deleteDiscovery,
+        adminApproveDiscovery,
+        adminRejectDiscovery,
         blogs,
         addBlog,
         allPhotos,

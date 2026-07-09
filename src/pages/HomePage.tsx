@@ -5,6 +5,7 @@ import CategoriesSection from '../components/CategoriesSection'
 import HiddenGemsSection from '../components/HiddenGemsSection'
 import TestimonialsSection from '../components/TestimonialsSection'
 import TravelScoreLeaderboard from '../components/TravelScoreLeaderboard'
+import DiscoveredDestinationsSection from '../components/DiscoveredDestinationsSection'
 import NewsletterSection from '../components/NewsletterSection'
 
 export default function HomePage() {
@@ -15,6 +16,7 @@ export default function HomePage() {
       <FeaturedDestinations />
       <CategoriesSection />
       <HiddenGemsSection />
+      <DiscoveredDestinationsSection />
       <TestimonialsSection />
       <TravelScoreLeaderboard />
       <NewsletterSection />

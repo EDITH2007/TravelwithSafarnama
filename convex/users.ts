@@ -101,7 +101,6 @@ export const getByToken = query({
 
       // Check if session has expired
       if (session.expiresAt < Date.now()) {
-        await ctx.db.delete(sessionId); // clean up expired session
         return null;
       }
 

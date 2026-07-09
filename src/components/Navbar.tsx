@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Sun, Moon, User } from 'lucide-react'
+import { Menu, X, Sun, Moon, User, Shield } from 'lucide-react'
 import { useThemeStore } from '../stores/themeStore'
 import { useAuth } from '../context/AuthContext'
 
@@ -97,14 +97,25 @@ export default function Navbar() {
                         </button>
 
                         {/* User Actions */}
-                        <Link
-                            to="/dashboard"
-                            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 
-                       text-white text-sm font-medium hover:bg-blue-700 transition-colors"
-                        >
-                            <User className="w-4 h-4" />
-                            <span>{user ? `Hi, ${user.name.split(' ')[0]}` : 'Sign In'}</span>
-                        </Link>
+                        <div className="hidden sm:flex items-center gap-2">
+                          {!user && (
+                            <Link
+                              to="/dashboard?prefill=somendra"
+                              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 text-xs font-semibold hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
+                            >
+                              <Shield className="w-3.5 h-3.5 text-blue-500" />
+                              <span>Admin Login</span>
+                            </Link>
+                          )}
+                          <Link
+                              to="/dashboard"
+                              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 
+                         text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+                          >
+                              <User className="w-4 h-4" />
+                              <span>{user ? `Hi, ${user.name.split(' ')[0]}` : 'Sign In'}</span>
+                          </Link>
+                        </div>
 
                         {/* Mobile Menu Button */}
                         <button
@@ -141,6 +152,15 @@ export default function Navbar() {
                                     {link.name}
                                 </Link>
                             ))}
+                            {!user && (
+                                <Link
+                                    to="/dashboard?prefill=somendra"
+                                    className="flex items-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-medium"
+                                >
+                                    <Shield className="w-5 h-5 text-blue-500" />
+                                    <span>Admin Login</span>
+                                </Link>
+                            )}
                             <Link
                                 to="/dashboard"
                                 className="flex items-center gap-2 px-4 py-3 rounded-xl bg-blue-600 
