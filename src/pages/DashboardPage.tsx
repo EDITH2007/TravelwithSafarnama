@@ -5,7 +5,7 @@ import {
   Heart, MapPin, User, Phone, Lock, Eye, EyeOff, 
   Edit3, LogOut, X, Compass, DollarSign, Calendar, 
   Plus, Trash, Star, Briefcase, ChevronRight,
-  Camera, BookOpen, Send, CheckSquare, Shield
+  Camera, BookOpen, Send, CheckSquare, Shield, Search
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { destinations } from '../data/destinations'
@@ -58,6 +58,9 @@ export default function DashboardPage() {
   const [expDescription, setExpDescription] = useState('');
   const [showAddExpense, setShowAddExpense] = useState(false);
 
+  // Explore search state for wishlist explore section
+  const [exploreSearch, setExploreSearch] = useState('');
+
   // Active Trip Details modal state
   const [selectedTrip, setSelectedTrip] = useState<any | null>(null);
 
@@ -98,6 +101,15 @@ export default function DashboardPage() {
     .filter(Boolean);
 
   const visitedStatesCount = new Set(visitedDestinationsData.map((d) => d?.state)).size;
+
+  // Filter destinations for the wishlist Explore section
+  const filteredExploreDestinations = destinations.filter((dest) => {
+    const matchesSearch = 
+      dest.name.toLowerCase().includes(exploreSearch.toLowerCase()) ||
+      dest.state.toLowerCase().includes(exploreSearch.toLowerCase()) ||
+      dest.category.some((cat) => cat.toLowerCase().includes(exploreSearch.toLowerCase()));
+    return matchesSearch;
+  });
 
   // Calculate statistics
   const totalSpent = expenses.reduce((sum, item) => sum + item.amount, 0);
@@ -862,14 +874,101 @@ export default function DashboardPage() {
                           ))}
                         </div>
                       ) : (
-                        <div className="text-center py-20 bg-white dark:bg-gray-900 border border-dashed rounded-3xl">
-                          <Heart className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">Your wishlist is empty</h3>
-                          <Link to="/destinations" className="inline-block px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold mt-4 shadow-sm">
-                            Browse Destinations
-                          </Link>
+                        <div className="text-center py-12 bg-white dark:bg-gray-900 border border-dashed rounded-3xl">
+                          <Heart className="w-10 h-10 mx-auto text-gray-300 mb-3" />
+                          <h3 className="font-bold text-sm text-gray-900 dark:text-white">Your wishlist is empty</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Use the Explore section below to add destinations!</p>
                         </div>
                       )}
+
+                      {/* EXPLORE DESTINATIONS SECTION */}
+                      <div className="border-t border-gray-200 dark:border-gray-800 pt-8 mt-8">
+                        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+                          <div>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Explore Destinations</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Directly add more destinations to your profile or wishlist</p>
+                          </div>
+                          {/* Search bar */}
+                          <div className="relative max-w-xs w-full">
+                            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input
+                              type="text"
+                              placeholder="Search destinations..."
+                              value={exploreSearch}
+                              onChange={(e) => setExploreSearch(e.target.value)}
+                              className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50 dark:bg-gray-950 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                          {filteredExploreDestinations.slice(0, 9).map((dest) => {
+                            const isSaved = savedDestinations.includes(dest.slug);
+                            const isVisited = visitedPlaces.includes(dest.slug);
+                            return (
+                              <div key={dest.slug} className="bg-white dark:bg-gray-900 border border-gray-200/50 dark:border-gray-800/50 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group">
+                                <div className="relative h-40 overflow-hidden">
+                                  <img 
+                                    src={dest.images[0]} 
+                                    alt={dest.name} 
+                                    className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                                  />
+                                  <button 
+                                    onClick={() => toggleSaveDestination(dest.slug)}
+                                    className={`absolute top-3 right-3 p-1.5 rounded-full shadow-md backdrop-blur-md transition-all ${
+                                      isSaved 
+                                        ? 'bg-red-50 dark:bg-red-950 text-red-500' 
+                                        : 'bg-white/80 dark:bg-gray-900/80 text-gray-400 hover:text-red-500'
+                                    }`}
+                                  >
+                                    <Heart className={`w-4 h-4 ${isSaved ? 'fill-red-500' : ''}`} />
+                                  </button>
+                                  {isVisited && (
+                                    <div className="absolute top-3 left-3 bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                                      Visited
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                                  <div>
+                                    <span className="text-[9px] text-gray-400 font-semibold uppercase">{dest.state}</span>
+                                    <h4 className="font-bold text-gray-900 dark:text-white text-sm mt-0.5">{dest.name}</h4>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2 mt-1 leading-normal">{dest.description}</p>
+                                  </div>
+                                  <div className="flex items-center justify-between pt-1">
+                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                                      ₹{dest.budget.min.toLocaleString()} - ₹{dest.budget.max.toLocaleString()}
+                                    </span>
+                                    <div className="flex gap-1.5">
+                                      <button 
+                                        onClick={() => toggleVisitedPlace(dest.slug)}
+                                        className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                                          isVisited
+                                            ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-400'
+                                            : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                        }`}
+                                      >
+                                        {isVisited ? 'Visited ✓' : 'Mark Visited'}
+                                      </button>
+                                      <Link 
+                                        to={`/destinations/${dest.slug}`}
+                                        className="px-2 py-1 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 text-gray-700 dark:text-gray-300 rounded-lg text-[10px] font-bold transition-colors"
+                                      >
+                                        Details
+                                      </Link>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {filteredExploreDestinations.length === 0 && (
+                          <div className="text-center py-10">
+                            <p className="text-xs text-gray-500">No matching destinations found.</p>
+                          </div>
+                        )}
+                      </div>
                     </motion.div>
                   )}
 
@@ -888,7 +987,7 @@ export default function DashboardPage() {
                       </div>
 
                       {visitedDestinationsData.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                           {visitedDestinationsData.map((dest) => {
                             const log = visitedLogs.find((l) => l.slug === dest?.slug);
                             return (

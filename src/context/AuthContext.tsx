@@ -116,6 +116,9 @@ interface AuthContextType {
   experiences: any[];
   landingPageStories: any[]; // Computed top 3 stories
   addExperience: (text: string, rating: number, destination: string, location: string) => void;
+
+  // Simulation for Mock Mode
+  simulateMockTravelActivity: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -128,6 +131,83 @@ async function hashPassword(password: string, salt: string): Promise<string> {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
+
+function getAvatarHash(username: string): string {
+  const avatars = [
+    '1535713875002-d1d0cf377fde', // man 1
+    '1494790108377-be9c29b29330', // woman 1
+    '1507003211169-0a1dd7228f2d', // man 2
+    '1438761681033-6461ffad8d80', // woman 2
+    '1500648767791-00dcc994a43e', // man 3
+    '1544005313-94ddf0286df2', // woman 3
+  ];
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) {
+    hash += username.charCodeAt(i);
+  }
+  return avatars[hash % avatars.length];
+}
+
+const seedMockData = (users: any[]) => {
+  const defaultTravelers = [
+    { _id: 'mock-user-siddharth', _creationTime: Date.now() - 10 * 60 * 1000, username: 'siddharth_explorer', name: 'Siddharth Roy', phone: '9999900001' },
+    { _id: 'mock-user-priya', _creationTime: Date.now() - 20 * 60 * 1000, username: 'priya_travels', name: 'Priya Sharma', phone: '9999900002' },
+    { _id: 'mock-user-amit', _creationTime: Date.now() - 30 * 60 * 1000, username: 'amit_himalayas', name: 'Amit Kumar', phone: '9999900003' },
+    { _id: 'mock-user-ananya', _creationTime: Date.now() - 40 * 60 * 1000, username: 'ananya_wanderlust', name: 'Ananya Patel', phone: '9999900004' },
+    { _id: 'mock-user-rahul', _creationTime: Date.now() - 50 * 60 * 1000, username: 'rahul_trips', name: 'Rahul Verma', phone: '9999900005' },
+  ];
+
+  let added = false;
+  defaultTravelers.forEach(traveler => {
+    if (!users.some(u => u.username === traveler.username)) {
+      users.push({
+        ...traveler,
+        passwordHash: 'seeded_password_hash',
+        salt: 'seededsalt'
+      });
+      added = true;
+
+      // Seed initial baseline records for these users in localStorage
+      if (traveler.username === 'siddharth_explorer') {
+        localStorage.setItem(`safarnama-visited-${traveler._id}`, JSON.stringify(['manali', 'hampi']));
+        localStorage.setItem(`safarnama-visitedlogs-${traveler._id}`, JSON.stringify([{
+          slug: 'manali',
+          rating: 5,
+          expense: 12000,
+          visitedHighlights: 'Solang Valley, Old Manali',
+          foodName: 'Siddu',
+          foodRating: 5,
+          weather: 'Sunny',
+          experience: 'Amazing mountains!',
+          date: Date.now() - 2 * 60 * 1000
+        }]));
+      } else if (traveler.username === 'priya_travels') {
+        localStorage.setItem(`safarnama-visited-${traveler._id}`, JSON.stringify(['goa', 'hampi']));
+        localStorage.setItem(`safarnama-visitedlogs-${traveler._id}`, JSON.stringify([{
+          slug: 'goa',
+          rating: 4,
+          expense: 8000,
+          visitedHighlights: 'Baga Beach, Dudhsagar Falls',
+          foodName: 'Fish Curry',
+          foodRating: 4,
+          weather: 'Rainy',
+          experience: 'Lush green Goa in monsoons.',
+          date: Date.now() - 4 * 60 * 1000
+        }]));
+      } else if (traveler.username === 'amit_himalayas') {
+        localStorage.setItem(`safarnama-visited-${traveler._id}`, JSON.stringify(['manali']));
+      } else if (traveler.username === 'ananya_wanderlust') {
+        localStorage.setItem(`safarnama-visited-${traveler._id}`, JSON.stringify(['hampi']));
+      } else if (traveler.username === 'rahul_trips') {
+        localStorage.setItem(`safarnama-visited-${traveler._id}`, JSON.stringify(['varanasi']));
+      }
+    }
+  });
+
+  if (added) {
+    localStorage.setItem('safarnama-mock-users', JSON.stringify(users));
+  }
+};
 
 // --- MOCK DATABASE HELPER (localStorage) ---
 const getMockUsers = (): any[] => {
@@ -148,6 +228,10 @@ const getMockUsers = (): any[] => {
     users.push(defaultAdmin);
     localStorage.setItem('safarnama-mock-users', JSON.stringify(users));
   }
+
+  // Seed default travelers
+  seedMockData(users);
+
   return users;
 };
 
@@ -1438,6 +1522,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const simulateMockTravelActivity = () => {
+    if (!isMock) return;
+    const mockUsers = getMockUsers().filter(u => u.username !== 'somendra' && u.username !== user?.username);
+    if (mockUsers.length === 0) return;
+    
+    const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
+    const slugs = ['manali', 'varanasi', 'hampi', 'goa', 'munnar', 'jaipur', 'leh-ladakh', 'ooty'];
+    const randomSlug = slugs[Math.floor(Math.random() * slugs.length)];
+    
+    const rand = Math.random();
+    const visitedKey = `safarnama-visited-${randomUser._id}`;
+    const logsKey = `safarnama-visitedlogs-${randomUser._id}`;
+    
+    let visited = JSON.parse(localStorage.getItem(visitedKey) || '[]');
+    let logs = JSON.parse(localStorage.getItem(logsKey) || '[]');
+    
+    if (rand < 0.4) {
+      // Add visited place
+      visited = visited.filter((s: string) => s !== randomSlug);
+      visited.push(randomSlug);
+      if (visited.length > 8) visited.shift(); // clean up to keep bounded
+      localStorage.setItem(visitedKey, JSON.stringify(visited));
+    } else if (rand < 0.7) {
+      // Add log
+      logs = logs.filter((l: any) => l.slug !== randomSlug);
+      logs.push({
+        slug: randomSlug,
+        rating: Math.floor(Math.random() * 2) + 4,
+        expense: Math.floor(Math.random() * 10000) + 2000,
+        visitedHighlights: "Beautiful attractions and scenery!",
+        foodName: "Local delicacy",
+        foodRating: 5,
+        weather: "Pleasant",
+        experience: "Had a great time traveling here!",
+        date: Date.now()
+      });
+      if (logs.length > 8) logs.shift(); // clean up
+      localStorage.setItem(logsKey, JSON.stringify(logs));
+    } else {
+      // Write blog
+      const savedBlogs = localStorage.getItem('safarnama-global-blogs');
+      const blogsList = savedBlogs ? JSON.parse(savedBlogs) : [...defaultBlogs];
+      
+      const newBlog = {
+        id: `blog-mock-${Date.now()}`,
+        slug: `adventure-${randomSlug}-${Date.now()}`,
+        title: `My amazing adventure in ${randomSlug.toUpperCase()}`,
+        excerpt: `A wonderful trip detailing the culture and sights of ${randomSlug}.`,
+        coverImage: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800",
+        author: {
+          name: randomUser.name,
+          avatar: `https://images.unsplash.com/photo-${getAvatarHash(randomUser.username)}?w=100`
+        },
+        category: "Adventure",
+        readTime: 5,
+        createdAt: new Date().toISOString().split('T')[0],
+        content: `I visited ${randomSlug} and it was incredible...`,
+        uploadedByUsername: randomUser.username,
+        _creationTime: Date.now()
+      };
+      
+      blogsList.push(newBlog);
+      
+      // Clean up mock blogs for this user if they have more than 5
+      const userBlogs = blogsList.filter((b: any) => b.uploadedByUsername === randomUser.username);
+      if (userBlogs.length > 5) {
+        const oldestBlog = userBlogs.sort((a: any, b: any) => (a._creationTime || 0) - (b._creationTime || 0))[0];
+        const idx = blogsList.findIndex((b: any) => b.id === oldestBlog.id);
+        if (idx > -1) blogsList.splice(idx, 1);
+      }
+      
+      localStorage.setItem('safarnama-global-blogs', JSON.stringify(blogsList));
+      setBlogs(blogsList);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -1479,6 +1639,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         experiences,
         landingPageStories,
         addExperience,
+        simulateMockTravelActivity,
       }}
     >
       {children}

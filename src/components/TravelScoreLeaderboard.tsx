@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Trophy, Shield, ArrowUp, ArrowDown, Gamepad2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useConvex } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 interface LeaderboardUser {
   name: string;
@@ -13,100 +15,166 @@ interface LeaderboardUser {
   change?: 'up' | 'down' | 'same';
 }
 
-const mockTravelers: LeaderboardUser[] = [
-  {
-    name: 'Siddharth Roy',
-    username: 'siddharth_explorer',
-    score: 1350,
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
-    badge: 'Globetrotter',
-  },
-  {
-    name: 'Priya Sharma',
-    username: 'priya_travels',
-    score: 1100,
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
-    badge: 'Pathfinder',
-  },
-  {
-    name: 'Amit Kumar',
-    username: 'amit_himalayas',
-    score: 950,
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
-    badge: 'Explorer',
-  },
-  {
-    name: 'Ananya Patel',
-    username: 'ananya_wanderlust',
-    score: 750,
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100',
-    badge: 'Wanderer',
-  },
-  {
-    name: 'Rahul Verma',
-    username: 'rahul_trips',
-    score: 550,
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100',
-    badge: 'Novice',
-  },
-]
-
 export default function TravelScoreLeaderboard() {
-  const { user, travelScore } = useAuth()
-  const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
+  const { user, isMock, simulateMockTravelActivity } = useAuth()
+  const convex = useConvex()
 
-  // Load and periodically simulate changes to mock scores
+  const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
+  const prevScoresRef = useRef<{ [username: string]: number }>({})
+
+  // Seed default travelers in database once on mount if in Live Mode
   useEffect(() => {
-    // Construct initial leaderboard including current user
-    const initialList = [...mockTravelers]
-    if (user) {
-      initialList.push({
-        name: `${user.name} (You)`,
-        username: user.username,
-        score: travelScore,
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100',
-        isCurrentUser: true,
-        badge: getTravelBadge(travelScore),
+    if (!isMock) {
+      convex.mutation(api.users.seedLeaderboard).catch((err) => {
+        console.warn("Could not auto-seed database. This is normal if Convex backend functions are not deployed yet:", err);
       })
     }
+  }, [isMock, convex])
 
-    // Sort initially
-    initialList.sort((a, b) => b.score - a.score)
-    setLeaderboard(initialList)
+  // Helper to calculate mock leaderboard for Mock Mode
+  const calculateMockLeaderboard = (): LeaderboardUser[] => {
+    const usersJson = localStorage.getItem('safarnama-mock-users')
+    const mockUsersList = usersJson ? JSON.parse(usersJson) : []
 
-    // Setup live interval to simulate leaderboard changes (goes high and down)
-    const interval = setInterval(() => {
-      setLeaderboard((prev) => {
-        const updated = prev.map((item) => {
-          // Keep current user static (or dynamic based on their actions)
-          if (item.isCurrentUser) {
-            return {
-              ...item,
-              score: travelScore,
-              badge: getTravelBadge(travelScore),
-            }
-          }
+    const calculatedList = mockUsersList.map((u: any) => {
+      const visited = JSON.parse(localStorage.getItem(`safarnama-visited-${u._id}`) || '[]')
+      const logs = JSON.parse(localStorage.getItem(`safarnama-visitedlogs-${u._id}`) || '[]')
+      
+      const blogsJson = localStorage.getItem('safarnama-global-blogs')
+      const allBlogs = blogsJson ? JSON.parse(blogsJson) : []
+      const userBlogs = allBlogs.filter((b: any) => b.uploadedByUsername === u.username)
 
-          // Random fluctuation (-15 to +20 points)
-          const fluctuation = Math.floor(Math.random() * 35) - 15
-          const nextScore = Math.max(100, item.score + fluctuation)
-          const change = fluctuation > 5 ? 'up' : fluctuation < -5 ? 'down' : 'same'
-          
-          return {
-            ...item,
-            score: nextScore,
-            badge: getTravelBadge(nextScore),
-            change: change as any,
-          }
-        })
+      const expsJson = localStorage.getItem('safarnama-global-experiences')
+      const allExps = expsJson ? JSON.parse(expsJson) : []
+      const userExps = allExps.filter((e: any) => e.uploadedByUsername === u.username)
 
-        // Sort descending by score
-        return [...updated].sort((a, b) => b.score - a.score)
+      // Calculate score
+      const visitedPoints = visited.length * 100
+      const detailedCount = logs.filter(
+        (l: any) => l.visitedHighlights || l.foodName || l.experience
+      ).length
+      const logBonus = detailedCount * 50
+      const blogPoints = userBlogs.length * 200
+      const storyPoints = userExps.length * 150
+      const baseScore = visitedPoints + logBonus + blogPoints + storyPoints
+
+      // Last activity time
+      let lastActivityTime = u._creationTime || Date.now()
+      logs.forEach((l: any) => {
+        if (l.date && l.date > lastActivityTime) lastActivityTime = l.date
       })
-    }, 6000)
+      userBlogs.forEach((b: any) => {
+        const t = b._creationTime || (b.createdAt ? new Date(b.createdAt).getTime() : 0)
+        if (t > lastActivityTime) lastActivityTime = t
+      })
 
-    return () => clearInterval(interval)
-  }, [user, travelScore])
+      // Decay score after 5 minutes of inactivity (1% per minute decay)
+      const inactivityMs = Date.now() - lastActivityTime
+      const inactivityMins = inactivityMs / (1000 * 60)
+      let decayFactor = 1.0
+      if (inactivityMins > 5) {
+        decayFactor = Math.pow(0.99, inactivityMins - 5)
+      }
+      decayFactor = Math.max(0.1, decayFactor)
+      const finalScore = Math.round(baseScore * decayFactor)
+
+      const avatars = [
+        '1535713875002',
+        '1494790108377',
+        '1507003211169',
+        '1438761681033',
+        '1500648767791',
+        '1544005313',
+      ]
+      let hash = 0
+      for (let i = 0; i < u.username.length; i++) {
+        hash += u.username.charCodeAt(i)
+      }
+      const avatarUrl = u.username === 'somendra'
+        ? 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100'
+        : `https://images.unsplash.com/photo-${avatars[hash % avatars.length]}?w=100`
+
+      return {
+        name: u.username === user?.username ? `${u.name} (You)` : u.name,
+        username: u.username,
+        score: finalScore,
+        avatar: avatarUrl,
+        badge: getTravelBadge(finalScore),
+        isCurrentUser: u.username === user?.username,
+      }
+    })
+
+    calculatedList.sort((a: any, b: any) => b.score - a.score)
+    return calculatedList
+  }
+
+  // Periodic simulations and leaderboard state refresh
+  useEffect(() => {
+    // 1. Travel Simulation Interval (every 15 seconds)
+    const simInterval = setInterval(() => {
+      if (isMock) {
+        simulateMockTravelActivity()
+      } else {
+        convex.mutation(api.users.simulateActivity).catch((err) => {
+          console.warn("Leaderboard background simulation failed, this is normal if backend functions are not deployed:", err)
+        })
+      }
+    }, 15000)
+
+    // 2. Leaderboard Recalculation & Ticking Interval
+    const refreshLeaderboard = async () => {
+      let currentList: LeaderboardUser[] = []
+
+      if (isMock) {
+        currentList = calculateMockLeaderboard()
+      } else {
+        try {
+          const result = await convex.query(api.users.getLeaderboard)
+          if (result) {
+            currentList = result.map((u: any) => ({
+              ...u,
+              isCurrentUser: user?.username === u.username,
+              name: u.username === user?.username ? `${u.name} (You)` : u.name,
+            }))
+          } else {
+            currentList = calculateMockLeaderboard()
+          }
+        } catch (err) {
+          // If Convex functions are not synced or error out, fall back to mock data
+          currentList = calculateMockLeaderboard()
+        }
+      }
+
+      // Compare with previous scores to show trend indicators
+      const nextList = currentList.slice(0, 5).map((item) => {
+        const prevScore = prevScoresRef.current[item.username]
+        let change: 'up' | 'down' | 'same' = 'same'
+        if (prevScore !== undefined) {
+          if (item.score > prevScore) change = 'up'
+          else if (item.score < prevScore) change = 'down'
+        }
+        return { ...item, change }
+      })
+
+      // Store new scores for next comparison (using Ref to avoid render loops)
+      const nextScores: { [username: string]: number } = {}
+      nextList.forEach((item) => {
+        nextScores[item.username] = item.score
+      })
+      prevScoresRef.current = nextScores
+
+      setLeaderboard(nextList)
+    }
+
+    refreshLeaderboard()
+    // Poll/tick decay calculations every 3 seconds
+    const refreshInterval = setInterval(refreshLeaderboard, 3000)
+
+    return () => {
+      clearInterval(simInterval)
+      clearInterval(refreshInterval)
+    }
+  }, [isMock, user])
 
   function getTravelBadge(score: number): string {
     if (score >= 1200) return 'Globetrotter'
