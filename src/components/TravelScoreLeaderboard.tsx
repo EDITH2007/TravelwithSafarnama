@@ -16,27 +16,31 @@ interface LeaderboardUser {
 }
 
 export default function TravelScoreLeaderboard() {
-  const { user, isMock, simulateMockTravelActivity } = useAuth()
+  const { user, isMock } = useAuth()
   const convex = useConvex()
 
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([])
   const prevScoresRef = useRef<{ [username: string]: number }>({})
 
-  // Seed default travelers in database once on mount if in Live Mode
+  // Clean up default mock travelers from Convex database on mount if in Live Mode
   useEffect(() => {
     if (!isMock) {
-      convex.mutation(api.users.seedLeaderboard).catch((err) => {
-        console.warn("Could not auto-seed database. This is normal if Convex backend functions are not deployed yet:", err);
+      convex.mutation(api.users.cleanUpSeededUsers).catch((err) => {
+        console.warn("Could not clean up default users from Convex database:", err);
       })
     }
   }, [isMock, convex])
 
-  // Helper to calculate mock leaderboard for Mock Mode
+  // Helper to calculate mock leaderboard for Mock Mode (persistent, no decay)
   const calculateMockLeaderboard = (): LeaderboardUser[] => {
     const usersJson = localStorage.getItem('safarnama-mock-users')
     const mockUsersList = usersJson ? JSON.parse(usersJson) : []
 
-    const calculatedList = mockUsersList.map((u: any) => {
+    // Exclude mock/seeded usernames to keep leaderboard to actual users
+    const defaultUsernames = ['siddharth_explorer', 'priya_travels', 'amit_himalayas', 'ananya_wanderlust', 'rahul_trips'];
+    const actualMockUsers = mockUsersList.filter((u: any) => !defaultUsernames.includes(u.username));
+
+    const calculatedList = actualMockUsers.map((u: any) => {
       const visited = JSON.parse(localStorage.getItem(`safarnama-visited-${u._id}`) || '[]')
       const logs = JSON.parse(localStorage.getItem(`safarnama-visitedlogs-${u._id}`) || '[]')
       
@@ -48,7 +52,7 @@ export default function TravelScoreLeaderboard() {
       const allExps = expsJson ? JSON.parse(expsJson) : []
       const userExps = allExps.filter((e: any) => e.uploadedByUsername === u.username)
 
-      // Calculate score
+      // Calculate score (XP)
       const visitedPoints = visited.length * 100
       const detailedCount = logs.filter(
         (l: any) => l.visitedHighlights || l.foodName || l.experience
@@ -57,26 +61,6 @@ export default function TravelScoreLeaderboard() {
       const blogPoints = userBlogs.length * 200
       const storyPoints = userExps.length * 150
       const baseScore = visitedPoints + logBonus + blogPoints + storyPoints
-
-      // Last activity time
-      let lastActivityTime = u._creationTime || Date.now()
-      logs.forEach((l: any) => {
-        if (l.date && l.date > lastActivityTime) lastActivityTime = l.date
-      })
-      userBlogs.forEach((b: any) => {
-        const t = b._creationTime || (b.createdAt ? new Date(b.createdAt).getTime() : 0)
-        if (t > lastActivityTime) lastActivityTime = t
-      })
-
-      // Decay score after 5 minutes of inactivity (1% per minute decay)
-      const inactivityMs = Date.now() - lastActivityTime
-      const inactivityMins = inactivityMs / (1000 * 60)
-      let decayFactor = 1.0
-      if (inactivityMins > 5) {
-        decayFactor = Math.pow(0.99, inactivityMins - 5)
-      }
-      decayFactor = Math.max(0.1, decayFactor)
-      const finalScore = Math.round(baseScore * decayFactor)
 
       const avatars = [
         '1535713875002',
@@ -97,9 +81,9 @@ export default function TravelScoreLeaderboard() {
       return {
         name: u.username === user?.username ? `${u.name} (You)` : u.name,
         username: u.username,
-        score: finalScore,
+        score: baseScore,
         avatar: avatarUrl,
-        badge: getTravelBadge(finalScore),
+        badge: getTravelBadge(baseScore),
         isCurrentUser: u.username === user?.username,
       }
     })
@@ -108,20 +92,9 @@ export default function TravelScoreLeaderboard() {
     return calculatedList
   }
 
-  // Periodic simulations and leaderboard state refresh
+  // Periodic leaderboard state refresh
   useEffect(() => {
-    // 1. Travel Simulation Interval (every 15 seconds)
-    const simInterval = setInterval(() => {
-      if (isMock) {
-        simulateMockTravelActivity()
-      } else {
-        convex.mutation(api.users.simulateActivity).catch((err) => {
-          console.warn("Leaderboard background simulation failed, this is normal if backend functions are not deployed:", err)
-        })
-      }
-    }, 15000)
-
-    // 2. Leaderboard Recalculation & Ticking Interval
+    // Leaderboard Recalculation & Ticking Interval
     const refreshLeaderboard = async () => {
       let currentList: LeaderboardUser[] = []
 
@@ -167,11 +140,10 @@ export default function TravelScoreLeaderboard() {
     }
 
     refreshLeaderboard()
-    // Poll/tick decay calculations every 3 seconds
+    // Poll updates every 3 seconds to sync client scores in real-time
     const refreshInterval = setInterval(refreshLeaderboard, 3000)
 
     return () => {
-      clearInterval(simInterval)
       clearInterval(refreshInterval)
     }
   }, [isMock, user])
